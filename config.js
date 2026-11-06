@@ -35,5 +35,31 @@ window.MICHE_CONFIG = {
 
   // Email signup: paste the form endpoint from an email tool (for example a Formspree form URL).
   // Leave empty until it's connected — the form will say signups aren't open yet.
-  signupEndpoint: ''
+  // The discount popup sends to this same endpoint: { email, phone, sms_consent, source }.
+  signupEndpoint: '',
+
+  // DISCOUNT POPUP
+  // Preview it any time, without sending anything, by adding ?popup=wheel or ?popup=scratch
+  // to the site address. Visitors only see it when enabled is true AND signupEndpoint is set.
+  popup: {
+    enabled: false,
+    style: 'wheel',       // 'wheel' or 'scratch'
+    delaySeconds: 6,      // how long after the page loads before it opens
+    hideForDays: 3,       // after someone closes it, wait this long before opening it again
+
+    // Every code here must also be created in Shopify: Discounts → Create discount → Amount off order / Free shipping.
+    // weight = how often that prize comes up, relative to the others (they don't need to add to 100).
+    prizes: [
+      { label: '10% OFF',   code: 'MICHE10',  weight: 30 },
+      { label: 'FREE SHIP', code: 'FREESHIP', weight: 10 },
+      { label: '15% OFF',   code: 'MICHE15',  weight: 15 },
+      { label: '10% OFF',   code: 'MICHE10',  weight: 30 },
+      { label: '20% OFF',   code: 'MICHE20',  weight: 5 },
+      { label: 'FREE SHIP', code: 'FREESHIP', weight: 10 }
+    ],
+
+    // Links shown in the text-message consent line.
+    privacyUrl: '[PRIVACY POLICY URL]',
+    termsUrl: '[TERMS URL]'
+  }
 };

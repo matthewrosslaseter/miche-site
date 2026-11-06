@@ -158,8 +158,13 @@
     }
     var id = (variants[state.piece] || {})[state.size];
     if (shop && id) {
-      // Shopify cart permalink: goes straight to checkout with this size and quantity.
-      window.location.href = 'https://' + shop + '/cart/' + encodeURIComponent(id) + ':' + state.qty;
+      // Shopify cart permalink: goes straight to checkout with this size and quantity,
+      // plus the popup discount code if this visitor won one.
+      var url = 'https://' + shop + '/cart/' + encodeURIComponent(id) + ':' + state.qty;
+      var prize = null;
+      try { prize = JSON.parse(window.localStorage.getItem('miche_prize') || 'null'); } catch (e) { prize = null; }
+      if (prize && prize.code) url += '?discount=' + encodeURIComponent(prize.code);
+      window.location.href = url;
       return;
     }
     notice.textContent = "Checkout isn't open yet. Join the drop list to hear first.";
