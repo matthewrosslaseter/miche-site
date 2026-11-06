@@ -66,8 +66,8 @@
 
   var PIECES = {
     set: { name: 'The Volt Set' },
-    hoodie: { name: 'The Volt Hoodie' },
-    pants: { name: 'The Volt Pants' }
+    hoodie: { name: 'The Volt Zip-Up' },
+    pants: { name: 'The Volt Flare Pants' }
   };
 
   // Single-page builds route by hash (#product-hoodie) instead of ?piece=hoodie
