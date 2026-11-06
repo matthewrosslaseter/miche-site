@@ -6,9 +6,9 @@
 window.MICHE_CONFIG = {
   // Prices shown everywhere on the site.
   prices: {
-    set: '[SET PRICE]',
-    hoodie: '[HOODIE PRICE]',
-    pants: '[PANTS PRICE]'
+    set: '$125',
+    hoodie: '$65',
+    pants: '$65'
   },
 
   // Shopify store address, without https:// — e.g. 'miche.myshopify.com'
@@ -19,9 +19,9 @@ window.MICHE_CONFIG = {
   // The variant ID is the long number at the end of the page address (…/variants/1234567890).
   // When a size has an ID, "Buy now" sends the customer straight to Shopify checkout.
   variants: {
-    set:    { S: '', M: '', L: '', XL: '', XXL: '' },
-    hoodie: { S: '', M: '', L: '', XL: '', XXL: '' },
-    pants:  { S: '', M: '', L: '', XL: '', XXL: '' }
+    set:    { XS: '', S: '', M: '', L: '' },
+    hoodie: { XS: '', S: '', M: '', L: '' },
+    pants:  { XS: '', S: '', M: '', L: '' }
   },
 
   // Product page photos. Put the image files in the /images folder, then fill in each src,
