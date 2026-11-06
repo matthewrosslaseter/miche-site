@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Volt Set — Miche</title>
+<meta name="description" content="The Volt Set by Miche. Full-zip hoodie and pants with the rhinestone Miche script. Sizes S–XXL.">
+<meta property="og:title" content="The Volt Set — Miche">
+<meta property="og:description" content="Full-zip hoodie and pants with the rhinestone Miche script.">
+<meta property="og:type" content="product">
+<meta name="theme-color" content="#0B0B0B">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<p class="announce">Drop 001 lands [DROP DATE] · Free shipping over [$X]</p>
+
+<header class="site-header">
+  <nav class="wrap nav" aria-label="Main">
+    <a class="wordmark" href="/">Miche</a>
+    <div class="nav-links">
+      <a href="/#shop">Shop</a>
+      <a href="/product?piece=set">The Volt Set</a>
+      <a href="/#about">About</a>
+      <a class="bag-link" href="#" data-cart-link aria-label="Bag">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+        <span>Bag</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<nav class="wrap crumbs" aria-label="Breadcrumb">
+  <a href="/">Home</a> / <a href="/#shop">Drop 001</a> / <span style="color: var(--fg)" data-name>The Volt Set</span>
+</nav>
+
+<main id="main" class="wrap product" data-product>
+
+  <div class="gallery">
+    <!-- PHOTOS: replace this div with <img class="photo r-45" id="main-photo" src="/images/set-front.jpg" alt="…">
+         and set the matching image paths in app.js (VIEWS) — see README. -->
+    <div class="ph r-45" id="main-photo"><b data-view-label>Front photo</b><span data-view-note>Full set, front, clean background</span></div>
+    <div class="thumbs" role="group" aria-label="Photos">
+      <button class="thumb" type="button" data-view="0" aria-pressed="true">Front</button>
+      <button class="thumb" type="button" data-view="1" aria-pressed="false">Back</button>
+      <button class="thumb" type="button" data-view="2" aria-pressed="false">Detail</button>
+      <button class="thumb" type="button" data-view="3" aria-pressed="false">On body</button>
+    </div>
+  </div>
+
+  <div class="buy">
+    <div class="buy-head">
+      <p class="eyebrow">Drop 001 · Volt</p>
+      <h1 class="display" data-name>The Volt Set</h1>
+      <p class="price" data-current-price>[SET PRICE]</p>
+      <p class="muted" style="margin: 0; color: var(--soft)">Full-zip hoodie and pants with the rhinestone Miche script. Grab the full set or pick up a piece.</p>
+    </div>
+
+    <div class="field">
+      <p class="field-label" id="piece-label">Piece</p>
+      <div class="opts" role="group" aria-labelledby="piece-label">
+        <button class="opt" type="button" data-piece="set" aria-pressed="true">Full set</button>
+        <button class="opt" type="button" data-piece="hoodie" aria-pressed="false">Hoodie only</button>
+        <button class="opt" type="button" data-piece="pants" aria-pressed="false">Pants only</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <p class="field-label">Color — <span>Volt</span></p>
+      <div class="swatch-row">
+        <span class="swatch" aria-hidden="true"></span>
+        <span class="small muted" style="font-size: 13px">More colorways next drop</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-top">
+        <p class="field-label" id="size-label">Size — <span data-size-label>Select</span></p>
+        <a href="#size-guide">Size guide</a>
+      </div>
+      <div class="sizes" role="group" aria-labelledby="size-label">
+        <button class="opt" type="button" data-size="S" aria-pressed="false">S</button>
+        <button class="opt" type="button" data-size="M" aria-pressed="false">M</button>
+        <button class="opt" type="button" data-size="L" aria-pressed="false">L</button>
+        <button class="opt" type="button" data-size="XL" aria-pressed="false">XL</button>
+        <button class="opt" type="button" data-size="XXL" aria-pressed="false">XXL</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="buy-row">
+        <div class="qty">
+          <button type="button" data-qty="-1" aria-label="Decrease quantity">−</button>
+          <output data-qty-value aria-live="polite">1</output>
+          <button type="button" data-qty="1" aria-label="Increase quantity">+</button>
+        </div>
+        <button class="btn btn-accent" type="button" data-buy>Buy now</button>
+      </div>
+      <p class="notice" data-notice role="status" aria-live="polite"></p>
+    </div>
+
+    <ul class="ship">
+      <li>Ships in [X] business days</li>
+      <li>Free shipping over [$X]</li>
+      <li>[RETURN WINDOW]-day returns on unworn pieces</li>
+    </ul>
+  </div>
+</main>
+
+<section class="rule-top">
+  <div class="wrap section info">
+    <div class="stack" style="gap: 20px">
+      <h2 class="display h-sub">Details</h2>
+      <dl class="specs">
+        <div><dt>Fabric</dt><dd>[GSM] fleece, [COMPOSITION]</dd></div>
+        <div><dt>Hoodie</dt><dd>Full zip, [POCKET STYLE]</dd></div>
+        <div><dt>Pants</dt><dd>[FIT — e.g. relaxed, straight leg]</dd></div>
+        <div><dt>Logo</dt><dd>Rhinestone Miche script</dd></div>
+        <div><dt>Care</dt><dd>Inside out, cold wash, hang dry. No iron on the logo.</dd></div>
+      </dl>
+    </div>
+    <div id="size-guide" class="stack" style="gap: 20px">
+      <h2 class="display h-sub">Size guide</h2>
+      <p class="muted small" style="margin: 0">Inches, measured flat. [Add measurements from the manufacturer spec sheet.]</p>
+      <div class="table-box">
+        <table>
+          <thead>
+            <tr><th scope="col">Size</th><th scope="col">Chest</th><th scope="col">Length</th><th scope="col">Waist</th><th scope="col">Inseam</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">S</th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><th scope="row">M</th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><th scope="row">L</th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><th scope="row">XL</th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><th scope="row">XXL</th><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="rule-top">
+  <div class="wrap section">
+    <h2 class="display h-sub" style="margin-bottom: 32px">In the wild</h2>
+    <div class="wild">
+      <div class="ph r-11"><b>Fit check</b><span>Hoodie open, full set, full length</span></div>
+      <div class="ph r-11"><b>Try-on</b><span>Friends in the set, no school logos in frame</span></div>
+      <div class="ph r-11"><b>Unboxing</b><span>Mailer, tissue and card</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <a class="wordmark" href="/">Miche</a>
+      <div class="footer-cols">
+        <div>
+          <p>Help</p>
+          <a href="#">Shipping</a>
+          <a href="#">Returns</a>
+          <a href="#size-guide">Size guide</a>
+          <a href="mailto:[EMAIL]">Contact</a>
+        </div>
+        <div>
+          <p>Follow</p>
+          <a href="#">Instagram [@HANDLE]</a>
+          <a href="#">TikTok [@HANDLE]</a>
+        </div>
+      </div>
+    </div>
+    <p class="copyright">© <span data-year>2026</span> Miche. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="/config.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
