@@ -70,9 +70,13 @@
     pants: { name: 'The Volt Pants' }
   };
 
+  // Single-page builds route by hash (#product-hoodie) instead of ?piece=hoodie
+  var hashRouting = document.documentElement.hasAttribute('data-hash-routing');
   var params = new URLSearchParams(window.location.search);
+  var hashPiece = (/^#product-(\w+)$/.exec(window.location.hash) || [])[1];
+  var startPiece = PIECES[params.get('piece')] ? params.get('piece') : (PIECES[hashPiece] ? hashPiece : 'set');
   var state = {
-    piece: PIECES[params.get('piece')] ? params.get('piece') : 'set',
+    piece: startPiece,
     size: '',
     qty: 1,
     view: 0
@@ -115,8 +119,17 @@
     $('[data-qty-value]').textContent = String(state.qty);
     setPressed($$('[data-piece]'), function (b) { return b.getAttribute('data-piece') === state.piece; });
     setPressed($$('[data-size]'), function (b) { return b.getAttribute('data-size') === state.size; });
-    document.title = name + ' — Miche';
+    if (!hashRouting) document.title = name + ' — Miche';
   }
+
+  window.MicheProduct = {
+    setPiece: function (p) {
+      if (!PIECES[p] || p === state.piece) return;
+      state.piece = p;
+      notice.textContent = '';
+      render();
+    }
+  };
 
   $$('[data-view]').forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -129,9 +142,13 @@
     btn.addEventListener('click', function () {
       state.piece = btn.getAttribute('data-piece');
       notice.textContent = '';
-      var url = new URL(window.location.href);
-      url.searchParams.set('piece', state.piece);
-      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+      if (hashRouting) {
+        window.history.replaceState(null, '', '#product-' + state.piece);
+      } else {
+        var url = new URL(window.location.href);
+        url.searchParams.set('piece', state.piece);
+        window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+      }
       render();
     });
   });

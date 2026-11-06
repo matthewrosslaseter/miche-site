@@ -11,10 +11,12 @@
   --display: 'Anton', Impact, 'Arial Narrow', sans-serif;
   --script: 'Great Vibes', cursive;
   --gutter: clamp(16px, 4vw, 48px);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+[id] { scroll-margin-top: 96px; }
 body {
   margin: 0;
   background: var(--bg);
@@ -43,7 +45,7 @@ button { font: inherit; }
   text-align: center; padding: 10px 16px;
 }
 .site-header {
-  position: sticky; top: 0; z-index: 20;
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
   background: rgba(11, 11, 11, 0.92);
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
@@ -230,7 +232,7 @@ tbody td { color: var(--muted); }
 .pop-backdrop {
   position: fixed; inset: 0; z-index: 100;
   display: flex; align-items: center; justify-content: center;
-  padding: 16px; background: rgba(0, 0, 0, 0.72);
+  padding: calc(16px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) calc(16px + env(safe-area-inset-left, 0px)); background: rgba(0, 0, 0, 0.72);
   opacity: 0; transition: opacity 0.2s ease;
 }
 .pop-backdrop.is-open { opacity: 1; }
@@ -293,7 +295,7 @@ tbody td { color: var(--muted); }
 .code-copy:hover { background: #FFFFFF; color: var(--ink); }
 
 .pop-tab {
-  position: fixed; left: 16px; bottom: 16px; z-index: 90;
+  position: fixed; left: calc(16px + env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 90;
   min-height: 44px; padding: 0 16px; border: 0; cursor: pointer;
   background: var(--accent); color: var(--ink); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   font-size: 13px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
@@ -302,3 +304,6 @@ tbody td { color: var(--muted); }
 @media (prefers-reduced-motion: reduce) {
   .pop-backdrop, .pop { transition: none; }
 }
+
+/* Keep scrolled content out from under a phone's status bar */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 25; background: var(--bg); }
