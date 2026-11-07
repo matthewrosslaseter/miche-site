@@ -79,6 +79,7 @@
               '<p class="pop-msg" role="status" aria-live="polite"></p>' +
             '</form>' +
             '<button class="pop-skip" type="button" data-close>No thanks</button>' +
+            (preview ? '<button class="pop-skip" type="button" data-skip-form>Skip the form (preview only)</button>' : '') +
           '</div>' +
 
           '<div class="pop-step" data-step="play" hidden>' +
@@ -86,9 +87,14 @@
               ? '<h2 class="display pop-title">Spin it</h2>' +
                 '<div class="wheel-wrap"><span class="wheel-pointer" aria-hidden="true"></span><svg class="wheel" viewBox="0 0 300 300" role="img" aria-label="Prize wheel"></svg></div>' +
                 '<button class="btn btn-accent pop-wide" type="button" data-spin>Spin</button>'
-              : '<h2 class="display pop-title">Scratch it</h2>' +
-                '<p class="pop-sub">Scratch the card with your finger or mouse.</p>' +
-                '<div class="scratch"><div class="scratch-prize" data-scratch-prize></div><canvas class="scratch-cover" aria-hidden="true"></canvas></div>' +
+              : '<h2 class="display pop-title" data-scratch-title>Scratch it</h2>' +
+                '<p class="pop-sub" data-scratch-sub>Drag your finger across the card to reveal your discount.</p>' +
+                '<div class="scratch">' +
+                  '<div class="scratch-prize"><span class="scratch-prize-label" data-scratch-prize></span><span class="scratch-prize-note">Miche · Drop 001</span></div>' +
+                  '<canvas class="scratch-cover" aria-hidden="true"></canvas>' +
+                  '<canvas class="scratch-fx" aria-hidden="true"></canvas>' +
+                  '<span class="scratch-hint" aria-hidden="true"><span></span></span>' +
+                '</div>' +
                 '<button class="pop-skip" type="button" data-reveal>Reveal it without scratching</button>') +
             '<p class="pop-msg" role="status" aria-live="polite" data-play-msg></p>' +
           '</div>' +
@@ -158,6 +164,7 @@
 
     function show(name) {
       step = name;
+      dialog.querySelector('[data-step="result"]').classList.remove('is-inline');
       Array.prototype.forEach.call(dialog.querySelectorAll('.pop-step'), function (el) {
         el.hidden = el.getAttribute('data-step') !== name;
       });
@@ -253,12 +260,27 @@
       });
     });
 
+    var skipForm = dialog.querySelector('[data-skip-form]');
+    if (skipForm) skipForm.addEventListener('click', function () { formMsg.textContent = ''; show('play'); });
+
     // ---------- prize ----------
     function award(index) {
       var p = prizes[index];
       won = { label: p.label, code: p.code };
       if (!preview) store.set(KEY_PRIZE, JSON.stringify(won));
-      later(function () { show('result'); }, 700);
+      if (isWheel) { later(function () { show('result'); }, 700); return; }
+      // Scratch card: keep the revealed card on screen and show the code right under it
+      later(function () {
+        fillResult();
+        dialog.querySelector('[data-scratch-title]').textContent = 'You won';
+        dialog.querySelector('[data-scratch-sub]').hidden = true;
+        dialog.querySelector('[data-reveal]').hidden = true;
+        var res = dialog.querySelector('[data-step="result"]');
+        res.classList.add('is-inline');
+        res.hidden = false;
+        step = 'result';
+        dialog.querySelector('[data-copy]').focus();
+      }, 650);
     }
     function fillResult() {
       if (!won) return;
@@ -362,73 +384,140 @@
 
       var card = dialog.querySelector('.scratch');
       var canvas = dialog.querySelector('.scratch-cover');
-      var ctx = canvas.getContext('2d');
-      var dpr = Math.max(1, window.devicePixelRatio || 1);
+      var fx = dialog.querySelector('.scratch-fx');
+      var hint = dialog.querySelector('.scratch-hint');
+      var ctx = canvas.getContext('2d', { willReadFrequently: true });
+      var fctx = fx.getContext('2d');
+      var dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
       var w = card.clientWidth, h = card.clientHeight;
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
+      [canvas, fx].forEach(function (c) {
+        c.width = Math.round(w * dpr);
+        c.height = Math.round(h * dpr);
+        c.style.width = w + 'px';
+        c.style.height = h + 'px';
+      });
       ctx.scale(dpr, dpr);
+      fctx.scale(dpr, dpr);
 
-      ctx.fillStyle = '#D4FF00';
+      // Volt foil: metallic sheen, grain, dashed edge, instructions
+      var g = ctx.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, '#BFE600');
+      g.addColorStop(0.42, '#DFFF4D');
+      g.addColorStop(0.5, '#F1FF9E');
+      g.addColorStop(0.58, '#D4FF00');
+      g.addColorStop(1, '#A9CC00');
+      ctx.fillStyle = g;
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = 'rgba(11, 11, 11, 0.09)';
-      ctx.lineWidth = 10;
-      for (var x = -h; x < w + h; x += 24) {
-        ctx.beginPath(); ctx.moveTo(x, h); ctx.lineTo(x + h, 0); ctx.stroke();
+      var grains = Math.round(w * h / 22);
+      for (var k = 0; k < grains; k++) {
+        ctx.fillStyle = Math.random() < 0.5 ? 'rgba(255, 255, 255, 0.22)' : 'rgba(11, 11, 11, 0.07)';
+        ctx.fillRect(Math.random() * w, Math.random() * h, 1.4, 1.4);
       }
+      ctx.strokeStyle = 'rgba(11, 11, 11, 0.28)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 6]);
+      ctx.strokeRect(10.5, 10.5, w - 21, h - 21);
+      ctx.setLineDash([]);
       ctx.fillStyle = '#0B0B0B';
-      ctx.font = '800 18px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('SCRATCH HERE', w / 2, h / 2);
+      ctx.font = '800 22px Inter, system-ui, sans-serif';
+      ctx.fillText('SCRATCH HERE', w / 2, h / 2 - 14);
+      ctx.font = '600 13px Inter, system-ui, sans-serif';
+      ctx.fillText('Drag to reveal your discount', w / 2, h / 2 + 12);
 
       ctx.globalCompositeOperation = 'destination-out';
-      ctx.strokeStyle = '#000000';
       ctx.fillStyle = '#000000';
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = 44;
 
-      var down = false, last = null, moves = 0, done = false;
+      var down = false, last = null, moves = 0, done = false, lastBuzz = 0;
+      var particles = [], fxRunning = false;
       var pos = function (e) {
         var b = canvas.getBoundingClientRect();
         return [e.clientX - b.left, e.clientY - b.top];
       };
-      var dot = function (p) { ctx.beginPath(); ctx.arc(p[0], p[1], 22, 0, Math.PI * 2); ctx.fill(); };
+      // A slightly rough brush so the edges look scratched, not cut
+      var dab = function (x, y) {
+        ctx.beginPath();
+        ctx.arc(x, y, 17 + Math.random() * 6, 0, Math.PI * 2);
+        ctx.fill();
+      };
+      var stroke = function (a, b) {
+        var dx = b[0] - a[0], dy = b[1] - a[1];
+        var steps = Math.max(1, Math.ceil(Math.sqrt(dx * dx + dy * dy) / 4));
+        for (var s = 1; s <= steps; s++) dab(a[0] + dx * s / steps, a[1] + dy * s / steps);
+      };
+      var tick = function () {
+        fctx.clearRect(0, 0, w, h);
+        particles = particles.filter(function (q) { return q.life > 0; });
+        particles.forEach(function (q) {
+          q.vy += 0.25; q.x += q.vx; q.y += q.vy; q.life--;
+          fctx.fillStyle = 'rgba(212, 255, 0, ' + Math.min(1, q.life / 20) + ')';
+          fctx.fillRect(q.x, q.y, q.s, q.s);
+        });
+        if (particles.length) requestAnimationFrame(tick); else fxRunning = false;
+      };
+      // Foil flakes flying off under the finger
+      var flakes = function (p) {
+        if (reduceMotion) return;
+        for (var i = 0; i < 3; i++) {
+          particles.push({ x: p[0], y: p[1], vx: (Math.random() - 0.5) * 3, vy: -Math.random() * 2, life: 30 + Math.random() * 20, s: 1.5 + Math.random() * 2.5 });
+        }
+        if (!fxRunning) { fxRunning = true; requestAnimationFrame(tick); }
+      };
+      // Tiny buzz while scratching, on phones that support it
+      var buzz = function () {
+        var t = Date.now();
+        if (navigator.vibrate && t - lastBuzz > 90) {
+          lastBuzz = t;
+          try { navigator.vibrate(4); } catch (err) { /* not allowed */ }
+        }
+      };
+      var clearedShare = function () {
+        var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        var clear = 0, total = 0;
+        for (var i = 3; i < data.length; i += 96) { total++; if (data[i] < 128) clear++; }
+        return total ? clear / total : 0;
+      };
       var finish = function () {
         if (done) return;
         done = true;
         played = true;
-        canvas.classList.add('is-gone');
+        down = false;
+        hint.hidden = true;
+        card.classList.add('is-revealed');
         playMsg.textContent = 'You got ' + prizes[prizeIndex].label + '.';
         award(prizeIndex);
-      };
-      var check = function () {
-        var data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        var clear = 0, total = 0;
-        for (var i = 3; i < data.length; i += 64) { total++; if (data[i] < 128) clear++; }
-        if (total && clear / total > 0.5) finish();
       };
 
       canvas.addEventListener('pointerdown', function (e) {
         if (done) return;
         down = true;
+        hint.hidden = true;
         try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
         last = pos(e);
-        dot(last);
+        dab(last[0], last[1]);
+        flakes(last);
       });
       canvas.addEventListener('pointermove', function (e) {
         if (!down || done) return;
-        var p = pos(e);
-        ctx.beginPath(); ctx.moveTo(last[0], last[1]); ctx.lineTo(p[0], p[1]); ctx.stroke();
-        last = p;
-        if (++moves % 6 === 0) check();
+        var list = (e.getCoalescedEvents && e.getCoalescedEvents()) || [];
+        if (!list.length) list = [e];
+        list.forEach(function (ev) { var p = pos(ev); stroke(last, p); last = p; });
+        flakes(last);
+        buzz();
+        if (++moves % 8 === 0 && clearedShare() > 0.55) finish();
       });
-      var up = function () { if (down) { down = false; check(); } };
+      var up = function () {
+        if (!down) return;
+        down = false;
+        if (clearedShare() > 0.55) finish();
+      };
       canvas.addEventListener('pointerup', up);
       canvas.addEventListener('pointercancel', up);
+      // Keep the page and popup from scrolling while a finger is on the card
+      ['touchstart', 'touchmove'].forEach(function (type) {
+        canvas.addEventListener(type, function (e) { e.preventDefault(); }, { passive: false });
+      });
       dialog.querySelector('[data-reveal]').addEventListener('click', finish);
     }
 
