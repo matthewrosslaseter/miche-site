@@ -27,8 +27,8 @@ window.MICHE_CONFIG = {
   // Shoot photos pulled from the Dropbox folder. Pick them at /photos on the site,
   // then put each photo's name here (e.g. hero: 'IMG_3207'). Empty = striped placeholder.
   shoot: {
-    hero: '', set: '', zipup: '', pants: '', macro: '',
-    front: '', back: '', detail: '', onbody: '',
+    hero: 'IMG_3221', set: 'IMG_3212', zipup: 'IMG_3227', pants: 'IMG_3171', macro: 'IMG_3168',
+    front: 'IMG_3161', back: 'IMG_3217', detail: 'IMG_3166', onbody: 'IMG_3176',
     wild1: '', wild2: '', wild3: ''
   },
 

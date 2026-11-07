@@ -49,6 +49,13 @@
     el.parentNode.replaceChild(img, el);
   });
 
+  // Hide the "In the wild" row until at least one of its photos is picked
+  var wild = $('.wild');
+  if (wild && !shoot.wild1 && !shoot.wild2 && !shoot.wild3) {
+    var wildSection = wild.closest('section');
+    if (wildSection) wildSection.hidden = true;
+  }
+
   // Let Matt know he's looking at his own photo preview, with a way out
   if (shootPreview) {
     var pill = document.createElement('div');
