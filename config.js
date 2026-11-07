@@ -56,7 +56,10 @@ window.MICHE_CONFIG = {
     delaySeconds: 10,     // seconds on the site before it opens
     hideForDays: 3,       // after someone closes it, wait this long before opening it again
 
-    // Every code here must also be created in Shopify: Discounts → Create discount → Amount off order / Free shipping.
+    // Scratch card: what everyone reveals before entering email + phone. Create this code in Shopify too.
+    scratchPrize: { label: '10% OFF', code: 'MICHE10' },
+
+    // Wheel prizes. Every code here must also be created in Shopify: Discounts → Create discount → Amount off order / Free shipping.
     // weight = how often that prize comes up, relative to the others (they don't need to add to 100).
     prizes: [
       { label: '10% OFF',   code: 'MICHE10',  weight: 30 },

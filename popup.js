@@ -48,9 +48,14 @@
       try { won = JSON.parse(store.get(KEY_PRIZE) || 'null'); } catch (e) { won = null; }
     }
     var joined = !preview && store.get(KEY_JOINED) === '1';
-    var title = isWheel ? 'Spin to win' : 'Scratch to win';
-    var unlock = isWheel ? 'Unlock my spin' : 'Unlock my card';
-    var thing = isWheel ? 'spin' : 'card';
+    // Scratch card: everyone scratches first and reveals the same offer, then enters email + phone for the code
+    var scratchPrize = (P.scratchPrize && P.scratchPrize.code) ? P.scratchPrize : { label: '10% OFF', code: 'MICHE10' };
+    var offText = String(scratchPrize.label).toLowerCase();
+    var title = isWheel ? 'Spin to win' : 'Get ' + offText;
+    var unlock = isWheel ? 'Unlock my spin' : 'Get my ' + offText;
+    var formSub = isWheel
+      ? 'Drop your email and number to unlock your spin. Every spin wins a discount.'
+      : 'Enter your email and number to unlock your code.';
     var shopHref = esc(safeUrl(P.shopLink || '/product?piece=set'));
 
     var html =
@@ -63,8 +68,8 @@
 
           '<div class="pop-step" data-step="form">' +
             '<p class="eyebrow">Drop 001 · Volt</p>' +
-            '<h2 class="display pop-title" id="pop-title">' + title + '</h2>' +
-            '<p class="pop-sub">Drop your email and number to unlock your ' + thing + '. Every ' + thing + ' wins a discount.</p>' +
+            '<h2 class="display pop-title"' + (isWheel ? ' id="pop-title"' : '') + '>' + title + '</h2>' +
+            '<p class="pop-sub">' + formSub + '</p>' +
             '<form class="pop-form" novalidate>' +
               '<label for="pop-email">Email</label>' +
               '<input id="pop-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@email.com" required>' +
@@ -87,8 +92,9 @@
               ? '<h2 class="display pop-title">Spin it</h2>' +
                 '<div class="wheel-wrap"><span class="wheel-pointer" aria-hidden="true"></span><svg class="wheel" viewBox="0 0 300 300" role="img" aria-label="Prize wheel"></svg></div>' +
                 '<button class="btn btn-accent pop-wide" type="button" data-spin>Spin</button>'
-              : '<h2 class="display pop-title" data-scratch-title>Scratch it</h2>' +
-                '<p class="pop-sub" data-scratch-sub>Drag your finger across the card to reveal your discount.</p>' +
+              : '<p class="eyebrow">Drop 001 · Volt</p>' +
+                '<h2 class="display pop-title" id="pop-title" data-scratch-title>' + esc(title) + '</h2>' +
+                '<p class="pop-sub" data-scratch-sub>Scratch the card to reveal your discount.</p>' +
                 '<div class="scratch">' +
                   '<div class="scratch-prize"><span class="scratch-prize-label" data-scratch-prize></span><span class="scratch-prize-note">Miche · Drop 001</span></div>' +
                   '<canvas class="scratch-cover" aria-hidden="true"></canvas>' +
@@ -125,11 +131,17 @@
     var formMsg = form.querySelector('.pop-msg');
     var submitBtn = form.querySelector('.pop-submit');
     var playMsg = dialog.querySelector('[data-play-msg]');
+    if (!isWheel) {
+      // Scratch flow: card first, then the email + phone form under it
+      var formStepEl = dialog.querySelector('[data-step="form"]');
+      formStepEl.parentNode.insertBefore(dialog.querySelector('[data-step="play"]'), formStepEl);
+      playMsg.classList.add('sr-only'); // the heading already says it; keep it for screen readers only
+    }
 
     var isOpen = false;
     var shownOnce = false;
     var lastFocus = null;
-    var step = won ? 'result' : (joined ? 'play' : 'form');
+    var step = won ? 'result' : (isWheel ? (joined ? 'play' : 'form') : 'play');
     var prizeIndex = -1;
     var played = false;
     var timers = [];
@@ -165,6 +177,7 @@
     function show(name) {
       step = name;
       dialog.querySelector('[data-step="result"]').classList.remove('is-inline');
+      dialog.querySelector('[data-step="form"]').classList.remove('is-inline');
       Array.prototype.forEach.call(dialog.querySelectorAll('.pop-step'), function (el) {
         el.hidden = el.getAttribute('data-step') !== name;
       });
@@ -176,7 +189,7 @@
 
     function updateTab() {
       if (isOpen) { tab.hidden = true; return; }
-      tab.textContent = won ? 'Your code: ' + won.code : (isWheel ? 'Spin for a discount' : 'Scratch for a discount');
+      tab.textContent = won ? 'Your code: ' + won.code : (isWheel ? 'Spin for a discount' : 'Get ' + offText);
       tab.hidden = false;
     }
 
@@ -240,7 +253,7 @@
       if (!consentInput.checked) { formMsg.textContent = 'Check the box to get texts and your code.'; consentInput.focus(); return; }
 
       // Preview, or no email/text tool connected yet: nothing to send to, so go straight to the game
-      if (preview || !C.signupEndpoint) { formMsg.textContent = ''; show('play'); return; }
+      if (preview || !C.signupEndpoint) { formMsg.textContent = ''; afterForm(); return; }
 
       submitBtn.disabled = true;
       formMsg.textContent = 'Unlocking…';
@@ -253,7 +266,7 @@
         joined = true;
         store.set(KEY_JOINED, '1');
         formMsg.textContent = '';
-        show('play');
+        afterForm();
       }).catch(function () {
         formMsg.textContent = 'Something went wrong. Try again.';
       }).then(function () {
@@ -261,27 +274,52 @@
       });
     });
 
+    function afterForm() {
+      if (isWheel) show('play');
+      else award(scratchPrize, 0);
+    }
     var skipForm = dialog.querySelector('[data-skip-form]');
-    if (skipForm) skipForm.addEventListener('click', function () { formMsg.textContent = ''; show('play'); });
+    if (skipForm) skipForm.addEventListener('click', function () { formMsg.textContent = ''; afterForm(); });
+
+    // Scratch card revealed: keep the card on screen and ask for email + phone right under it
+    function askForDetails() {
+      later(function () {
+        dialog.querySelector('[data-scratch-title]').textContent = 'You got ' + offText;
+        dialog.querySelector('[data-scratch-sub]').textContent = formSub;
+        dialog.querySelector('[data-reveal]').hidden = true;
+        var formStep = dialog.querySelector('[data-step="form"]');
+        formStep.classList.add('is-inline');
+        formStep.hidden = false;
+        step = 'form';
+        emailInput.focus();
+      }, 650);
+    }
 
     // ---------- prize ----------
-    function award(index) {
-      var p = prizes[index];
+    function award(p, delay) {
       won = { label: p.label, code: p.code };
       if (!preview) store.set(KEY_PRIZE, JSON.stringify(won));
-      if (isWheel) { later(function () { show('result'); }, 700); return; }
-      // Scratch card: keep the revealed card on screen and show the code right under it
+      if (isWheel) { later(function () { show('result'); }, delay); return; }
+      // Scratch card: code appears under the revealed card, in place of the form
       later(function () {
         fillResult();
-        dialog.querySelector('[data-scratch-title]').textContent = 'You won';
+        var card = dialog.querySelector('.scratch');
+        if (!card.classList.contains('is-revealed')) {
+          // Reopened later or skipped ahead: show the card already scratched
+          setupScratch();
+          card.classList.add('is-revealed');
+        }
+        dialog.querySelector('[data-scratch-title]').textContent = 'You got ' + offText;
         dialog.querySelector('[data-scratch-sub]').hidden = true;
         dialog.querySelector('[data-reveal]').hidden = true;
+        dialog.querySelector('[data-step="play"]').hidden = false;
+        dialog.querySelector('[data-step="form"]').hidden = true;
         var res = dialog.querySelector('[data-step="result"]');
         res.classList.add('is-inline');
         res.hidden = false;
         step = 'result';
         dialog.querySelector('[data-copy]').focus();
-      }, 650);
+      }, delay);
     }
     function fillResult() {
       if (!won) return;
@@ -368,7 +406,7 @@
           if (finished) return;
           finished = true;
           playMsg.textContent = 'You landed on ' + prizes[prizeIndex].label + '.';
-          award(prizeIndex);
+          award(prizes[prizeIndex], 700);
         };
         wheel.addEventListener('transitionend', finish, { once: true });
         later(finish, reduceMotion ? 1500 : 6000);
@@ -380,8 +418,7 @@
     function setupScratch() {
       if (scratchReady || isWheel) return;
       scratchReady = true;
-      if (prizeIndex < 0) prizeIndex = pickPrize();
-      dialog.querySelector('[data-scratch-prize]').textContent = prizes[prizeIndex].label;
+      dialog.querySelector('[data-scratch-prize]').textContent = scratchPrize.label;
 
       var card = dialog.querySelector('.scratch');
       var canvas = dialog.querySelector('.scratch-cover');
@@ -486,8 +523,8 @@
         down = false;
         hint.hidden = true;
         card.classList.add('is-revealed');
-        playMsg.textContent = 'You got ' + prizes[prizeIndex].label + '.';
-        award(prizeIndex);
+        playMsg.textContent = 'You got ' + offText + '.';
+        askForDetails();
       };
 
       canvas.addEventListener('pointerdown', function (e) {
