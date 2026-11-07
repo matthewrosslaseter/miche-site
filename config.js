@@ -48,11 +48,12 @@ window.MICHE_CONFIG = {
 
   // DISCOUNT POPUP
   // Preview it any time, without sending anything, by adding ?popup=wheel or ?popup=scratch
-  // to the site address. Visitors only see it when enabled is true AND signupEndpoint is set.
+  // to the site address. When enabled, it opens for visitors after delaySeconds on the site.
+  // Until signupEndpoint is set, emails and phone numbers are NOT saved anywhere.
   popup: {
-    enabled: false,
-    style: 'wheel',       // 'wheel' or 'scratch'
-    delaySeconds: 6,      // how long after the page loads before it opens
+    enabled: true,
+    style: 'scratch',     // 'wheel' or 'scratch'
+    delaySeconds: 10,     // seconds on the site before it opens
     hideForDays: 3,       // after someone closes it, wait this long before opening it again
 
     // Every code here must also be created in Shopify: Discounts → Create discount → Amount off order / Free shipping.

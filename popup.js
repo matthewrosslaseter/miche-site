@@ -19,7 +19,7 @@
   var KEY_CLOSED = 'miche_popup_closed';
   var KEY_JOINED = 'miche_popup_joined';
   var KEY_PRIZE = 'miche_prize';
-  var live = !!(P.enabled && C.signupEndpoint);
+  var live = !!P.enabled;
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var current = null;
 
@@ -239,7 +239,8 @@
       if (!phone) { formMsg.textContent = 'Enter a 10-digit US phone number.'; phoneInput.focus(); return; }
       if (!consentInput.checked) { formMsg.textContent = 'Check the box to get texts and your code.'; consentInput.focus(); return; }
 
-      if (preview) { formMsg.textContent = ''; show('play'); return; }
+      // Preview, or no email/text tool connected yet: nothing to send to, so go straight to the game
+      if (preview || !C.signupEndpoint) { formMsg.textContent = ''; show('play'); return; }
 
       submitBtn.disabled = true;
       formMsg.textContent = 'Unlocking…';
@@ -533,12 +534,14 @@
     if (preview) {
       open();
     } else if (eligible()) {
-      var timer = later(open, Math.max(0, Number(P.delaySeconds) || 0) * 1000);
-      // Desktop: open early if the cursor heads for the tab bar
-      listen(document, 'mouseout', function (e) {
-        if (shownOnce) return;
-        if (!e.relatedTarget && e.clientY <= 0) { clearTimeout(timer); open(); }
-      });
+      // Count from the visitor's first page this visit, so moving between pages doesn't restart the clock
+      var firstSeen = Date.now();
+      try {
+        var saved = Number(window.sessionStorage.getItem('miche_first_seen'));
+        if (saved) firstSeen = saved; else window.sessionStorage.setItem('miche_first_seen', String(firstSeen));
+      } catch (e) { /* storage blocked */ }
+      var wait = Math.max(0, Number(P.delaySeconds) || 0) * 1000 - (Date.now() - firstSeen);
+      later(function () { if (!shownOnce) open(); }, Math.max(0, wait));
     } else {
       updateTab();
     }
