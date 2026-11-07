@@ -93,8 +93,8 @@
                 '<div class="wheel-wrap"><span class="wheel-pointer" aria-hidden="true"></span><svg class="wheel" viewBox="0 0 300 300" role="img" aria-label="Prize wheel"></svg></div>' +
                 '<button class="btn btn-accent pop-wide" type="button" data-spin>Spin</button>'
               : '<p class="eyebrow">Drop 001 · Volt</p>' +
-                '<h2 class="display pop-title" id="pop-title" data-scratch-title>' + esc(title) + '</h2>' +
-                '<p class="pop-sub" data-scratch-sub>Scratch the card to reveal your discount.</p>' +
+                '<h2 class="display pop-title" id="pop-title" data-scratch-title>Mystery discount</h2>' +
+                '<p class="pop-sub" data-scratch-sub>Scratch the card to see what you got.</p>' +
                 '<div class="scratch">' +
                   '<div class="scratch-prize"><span class="scratch-prize-label" data-scratch-prize></span><span class="scratch-prize-note">Miche · Drop 001</span></div>' +
                   '<canvas class="scratch-cover" aria-hidden="true"></canvas>' +
@@ -189,7 +189,7 @@
 
     function updateTab() {
       if (isOpen) { tab.hidden = true; return; }
-      tab.textContent = won ? 'Your code: ' + won.code : (isWheel ? 'Spin for a discount' : 'Get ' + offText);
+      tab.textContent = won ? 'Your code: ' + won.code : (isWheel ? 'Spin for a discount' : 'Mystery discount');
       tab.hidden = false;
     }
 
