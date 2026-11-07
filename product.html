@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Volt Set — Miche</title>
-<meta name="description" content="The Volt Set by Miche. Cropped zip-up and high-waisted flare pants with the rhinestone Miche script. Sizes XS–L.">
-<meta property="og:title" content="The Volt Set — Miche">
+<title>The Fitted Set — Miche</title>
+<meta name="description" content="The Fitted Set by Miche, in neon and pink. Cropped zip-up and high-waisted flare pants with the rhinestone Miche script. Sizes XS–L.">
+<meta property="og:title" content="The Fitted Set — Miche">
 <meta property="og:description" content="Cropped zip-up and high-waisted flare pants with the rhinestone Miche script.">
 <meta property="og:type" content="product">
 <meta name="theme-color" content="#0B0B0B">
@@ -25,7 +25,7 @@
     <a class="wordmark" href="/">Miche</a>
     <div class="nav-links">
       <a href="/#shop">Shop</a>
-      <a href="/product?piece=set">The Volt Set</a>
+      <a href="/product?piece=set">The Fitted Set</a>
       <a href="/#about">About</a>
       <a class="bag-link" href="#" data-cart-link aria-label="Bag">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
@@ -36,27 +36,29 @@
 </header>
 
 <nav class="wrap crumbs" aria-label="Breadcrumb">
-  <a href="/">Home</a> / <a href="/#shop">Drop 001</a> / <span style="color: var(--fg)" data-name>The Volt Set</span>
+  <a href="/">Home</a> / <a href="/#shop">Drop 001</a> / <span style="color: var(--fg)" data-name>The Fitted Set</span>
 </nav>
 
 <main id="main" class="wrap product" data-product>
 
   <div class="gallery">
-    <!-- PHOTOS: replace this div with <img class="photo r-45" id="main-photo" src="/images/set-front.jpg" alt="…">
-         and set the matching image paths in app.js (VIEWS) — see README. -->
-    <div class="ph r-45" id="main-photo"><b data-view-label>Front photo</b><span data-view-note>Full set, front, clean background</span></div>
-    <div class="thumbs" role="group" aria-label="Photos">
-      <button class="thumb" type="button" data-view="0" aria-pressed="true">Front</button>
-      <button class="thumb" type="button" data-view="1" aria-pressed="false">Back</button>
-      <button class="thumb" type="button" data-view="2" aria-pressed="false">Detail</button>
-      <button class="thumb" type="button" data-view="3" aria-pressed="false">On body</button>
+    <div class="main-wrap">
+      <div class="ph r-45" id="main-photo"><b>Photo</b><span>Loading…</span></div>
+      <button class="gal-nav gal-prev" type="button" data-gal="-1" aria-label="Previous photo" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <button class="gal-nav gal-next" type="button" data-gal="1" aria-label="Next photo" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <span class="gal-count" data-gal-count aria-live="polite" hidden></span>
     </div>
+    <div class="thumbs" role="group" aria-label="Photos" data-thumbs></div>
   </div>
 
   <div class="buy">
     <div class="buy-head">
-      <p class="eyebrow">Drop 001 · Volt</p>
-      <h1 class="display" data-name>The Volt Set</h1>
+      <p class="eyebrow">Drop 001 · <span data-color-name>Neon</span></p>
+      <h1 class="display" data-name>The Fitted Set</h1>
       <p class="price" data-current-price>$125</p>
       <p class="muted" style="margin: 0; color: var(--soft)">Women's fitted set. A cropped zip-up and high-waisted flare pants with the rhinestone Miche script. Grab the full set or pick up a piece.</p>
     </div>
@@ -71,10 +73,10 @@
     </div>
 
     <div class="field">
-      <p class="field-label">Color — <span>Volt</span></p>
-      <div class="swatch-row">
-        <span class="swatch" aria-hidden="true"></span>
-        <span class="small muted" style="font-size: 13px">More colorways next drop</span>
+      <p class="field-label" id="color-label">Color — <span data-color-name>Neon</span></p>
+      <div class="colors" role="group" aria-labelledby="color-label">
+        <button class="color-opt" type="button" data-color="neon" aria-pressed="true"><span class="dot" data-swatch="neon"></span>Neon</button>
+        <button class="color-opt" type="button" data-color="pink" aria-pressed="false"><span class="dot" data-swatch="pink"></span>Pink</button>
       </div>
     </div>
 
@@ -163,9 +165,9 @@
   <div class="wrap section">
     <h2 class="display h-sub" style="margin-bottom: 32px">In the wild</h2>
     <div class="wild">
-      <div class="ph r-11" data-role="wild1" data-alt="Miche Volt set fit check"><b>Fit check</b><span>Zip-up open, full set, full length</span></div>
-      <div class="ph r-11" data-role="wild2" data-alt="Miche Volt set worn"><b>Try-on</b><span>Friends in the set, no school logos in frame</span></div>
-      <div class="ph r-11" data-role="wild3" data-alt="Miche Volt set"><b>Unboxing</b><span>Mailer, tissue and card</span></div>
+      <div class="ph r-11" data-role="wild1" data-alt="Miche fitted set fit check"><b>Fit check</b><span>Zip-up open, full set, full length</span></div>
+      <div class="ph r-11" data-role="wild2" data-alt="Miche fitted set worn"><b>Try-on</b><span>Friends in the set, no school logos in frame</span></div>
+      <div class="ph r-11" data-role="wild3" data-alt="Miche fitted set"><b>Unboxing</b><span>Mailer, tissue and card</span></div>
     </div>
   </div>
 </section>
@@ -194,6 +196,7 @@
 </footer>
 
 <script src="/config.js"></script>
+<script src="/photos.js"></script>
 <script src="/app.js"></script>
 <script src="/popup.js"></script>
 </body>

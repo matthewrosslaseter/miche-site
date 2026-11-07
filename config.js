@@ -14,32 +14,47 @@ window.MICHE_CONFIG = {
   // Shopify store address, without https:// — e.g. 'miche.myshopify.com'
   shopDomain: '',
 
-  // Shopify variant IDs for each piece and size.
+  // Colorways. The build sorts every shoot photo into one of these by color.
+  // swatch: leave '' to use the shade measured from the photos, or set a hex like '#EB93AD'.
+  colorways: [
+    { id: 'neon', name: 'Neon', swatch: '' },
+    { id: 'pink', name: 'Pink', swatch: '' }
+  ],
+
+  // Fix a photo the build put in the wrong color: { IMG_3194: 'pink' }. Use 'none' to keep a photo off the product page.
+  colorOverrides: {},
+
+  // Shopify variant IDs for each color, piece and size.
   // Find one in Shopify admin: Products → open the product → click the size variant.
   // The variant ID is the long number at the end of the page address (…/variants/1234567890).
   // When a size has an ID, "Buy now" sends the customer straight to Shopify checkout.
   variants: {
-    set:    { XS: '', S: '', M: '', L: '' },
-    hoodie: { XS: '', S: '', M: '', L: '' },
-    pants:  { XS: '', S: '', M: '', L: '' }
+    neon: {
+      set:    { XS: '', S: '', M: '', L: '' },
+      hoodie: { XS: '', S: '', M: '', L: '' },
+      pants:  { XS: '', S: '', M: '', L: '' }
+    },
+    pink: {
+      set:    { XS: '', S: '', M: '', L: '' },
+      hoodie: { XS: '', S: '', M: '', L: '' },
+      pants:  { XS: '', S: '', M: '', L: '' }
+    }
   },
 
   // Shoot photos pulled from the Dropbox folder. Pick them at /photos on the site,
   // then put each photo's name here (e.g. hero: 'IMG_3207'). Empty = striped placeholder.
   shoot: {
-    hero: 'IMG_3221', set: 'IMG_3212', zipup: 'IMG_3227', pants: 'IMG_3171', macro: 'IMG_3168',
-    front: 'IMG_3161', back: 'IMG_3217', detail: 'IMG_3166', onbody: 'IMG_3176',
+    hero: 'IMG_3221', setNeon: 'IMG_3178', setPink: 'IMG_3212', zipup: 'IMG_3227', pants: 'IMG_3171', macro: 'IMG_3168',
     wild1: '', wild2: '', wild3: ''
   },
 
-  // Product page photos. Put the image files in the /images folder, then fill in each src,
-  // e.g. src: '/images/set-front.jpg'. Empty src shows the striped placeholder.
-  photos: [
-    { label: 'Front',   note: 'Full set, front, clean background',      src: '', alt: 'The Volt Set, front' },
-    { label: 'Back',    note: 'Full set, back, clean background',       src: '', alt: 'The Volt Set, back' },
-    { label: 'Detail',  note: 'Rhinestone script up close, good light', src: '', alt: 'Rhinestone Miche script up close' },
-    { label: 'On body', note: 'Fit check, full length',                 src: '', alt: 'The Volt Set worn, full length' }
-  ],
+  // Product page photos for each color. These show first, then more photos of that color fill in
+  // (up to galleryLimit). A photo only shows under its own color.
+  colorPhotos: {
+    neon: ['IMG_3161', 'IMG_3166', 'IMG_3176'],
+    pink: ['IMG_3212', 'IMG_3217']
+  },
+  galleryLimit: 12,
 
   // Email signup: paste the form endpoint from an email tool (for example a Formspree form URL).
   // Leave empty until it's connected — the form will say signups aren't open yet.

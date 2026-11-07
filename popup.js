@@ -67,7 +67,7 @@
           (preview ? '<p class="pop-preview">Preview — nothing is sent or saved</p>' : '') +
 
           '<div class="pop-step" data-step="form">' +
-            '<p class="eyebrow">Drop 001 · Volt</p>' +
+            '<p class="eyebrow">Drop 001</p>' +
             '<h2 class="display pop-title"' + (isWheel ? ' id="pop-title"' : '') + '>' + title + '</h2>' +
             '<p class="pop-sub">' + formSub + '</p>' +
             '<form class="pop-form" novalidate>' +
@@ -92,7 +92,7 @@
               ? '<h2 class="display pop-title">Spin it</h2>' +
                 '<div class="wheel-wrap"><span class="wheel-pointer" aria-hidden="true"></span><svg class="wheel" viewBox="0 0 300 300" role="img" aria-label="Prize wheel"></svg></div>' +
                 '<button class="btn btn-accent pop-wide" type="button" data-spin>Spin</button>'
-              : '<p class="eyebrow">Drop 001 · Volt</p>' +
+              : '<p class="eyebrow">Drop 001</p>' +
                 '<h2 class="display pop-title" id="pop-title" data-scratch-title>Mystery discount</h2>' +
                 '<p class="pop-sub" data-scratch-sub>Scratch the card to see what you got.</p>' +
                 '<div class="scratch">' +
@@ -437,7 +437,7 @@
       ctx.scale(dpr, dpr);
       fctx.scale(dpr, dpr);
 
-      // Volt foil: metallic sheen, grain, dashed edge, instructions
+      // Neon foil: metallic sheen, grain, dashed edge, instructions
       var g = ctx.createLinearGradient(0, 0, w, h);
       g.addColorStop(0, '#BFE600');
       g.addColorStop(0.42, '#DFFF4D');

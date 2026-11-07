@@ -39,6 +39,12 @@
   .bar .btn { min-height: 48px; padding: 0 18px; font-size: 13px; }
   .bar-msg { width: 100%; margin: 0; font-size: 13px; color: var(--accent); min-height: 1.2em; }
   .empty { padding: 40px 0; color: var(--soft); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; padding-bottom: 16px; }
+  .filters .opt { min-height: 44px; padding: 0 16px; }
+  .shot-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .shot-color { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--soft); }
+  .shot-color .dot { width: 12px; height: 12px; }
+  .shot select + select { margin-top: -2px; }
 </style>
 </head>
 <body>
@@ -53,7 +59,12 @@
   <div class="picker-head">
     <p class="eyebrow">Shoot photos · from Dropbox</p>
     <h1 class="display">Pick the photos</h1>
-    <p>Choose where each shot goes with the menu under it. Tap a photo to see it full size. When you're done, tap <strong>Preview on site</strong> to see it on this phone, then <strong>Copy picks</strong> and paste them to Claude to make them live for everyone.</p>
+    <p>Choose where each shot goes with the first menu under it. Each photo is already sorted into neon or pink; if one is wrong, fix it with the second menu. Tap a photo to see it full size. When you're done, tap <strong>Preview on site</strong> to see it on this phone, then <strong>Copy picks</strong> and paste them to Claude to make them live for everyone.</p>
+  </div>
+  <div class="filters" role="group" aria-label="Show photos" data-filters>
+    <button class="opt" type="button" data-filter="" aria-pressed="true">All</button>
+    <button class="opt" type="button" data-filter="neon" aria-pressed="false">Neon</button>
+    <button class="opt" type="button" data-filter="pink" aria-pressed="false">Pink</button>
   </div>
   <div class="roles" data-roles></div>
   <div class="shots" data-shots><p class="empty">Loading photos…</p></div>
@@ -61,7 +72,7 @@
 
 <div class="bar">
   <div class="wrap bar-inner">
-    <span class="bar-count" data-count>0 of 12 spots filled</span>
+    <span class="bar-count" data-count>0 spots filled</span>
     <span class="btn-row">
       <button class="btn btn-outline" type="button" data-preview>Preview on site</button>
       <button class="btn btn-accent" type="button" data-copy>Copy picks</button>
@@ -71,30 +82,47 @@
 </div>
 
 <script src="/config.js"></script>
+<script src="/photos.js"></script>
 <script>
 (function () {
   'use strict';
+  var C = window.MICHE_CONFIG || {};
+  var COLORS = (C.colorways && C.colorways.length) ? C.colorways : [{ id: 'neon', name: 'Neon' }, { id: 'pink', name: 'Pink' }];
+  var colorById = {};
+  COLORS.forEach(function (c) { colorById[c.id] = c; });
+
   var ROLES = [
-    { id: 'hero',   label: 'Home: big hero' },
-    { id: 'set',    label: 'Shop card: full set' },
-    { id: 'zipup',  label: 'Shop card: zip-up' },
-    { id: 'pants',  label: 'Shop card: pants' },
-    { id: 'macro',  label: 'Home: rhinestone close-up' },
-    { id: 'front',  label: 'Product: front' },
-    { id: 'back',   label: 'Product: back' },
-    { id: 'detail', label: 'Product: close-up' },
-    { id: 'onbody', label: 'Product: on body' },
-    { id: 'wild1',  label: 'In the wild 1' },
-    { id: 'wild2',  label: 'In the wild 2' },
-    { id: 'wild3',  label: 'In the wild 3' }
+    { id: 'hero',    label: 'Home: big hero' },
+    { id: 'macro',   label: 'Home: close-up' },
+    { id: 'setNeon', label: 'Shop card: neon set', color: 'neon' },
+    { id: 'setPink', label: 'Shop card: pink set', color: 'pink' },
+    { id: 'zipup',   label: 'Shop card: zip-up' },
+    { id: 'pants',   label: 'Shop card: pants' }
   ];
+  COLORS.forEach(function (c) {
+    for (var i = 1; i <= 4; i++) ROLES.push({ id: c.id + i, label: c.name + ': product photo ' + i, color: c.id });
+  });
+  ROLES.push({ id: 'wild1', label: 'In the wild 1' }, { id: 'wild2', label: 'In the wild 2' }, { id: 'wild3', label: 'In the wild 3' });
+
   var KEY = 'miche_shoot_preview';
-  var live = (window.MICHE_CONFIG && window.MICHE_CONFIG.shoot) || {};
   var picks = {};
-  ROLES.forEach(function (r) { if (live[r.id]) picks[r.id] = live[r.id]; });
+  var shootCfg = C.shoot || {};
+  ROLES.forEach(function (r) { if (shootCfg[r.id]) picks[r.id] = shootCfg[r.id]; });
+  COLORS.forEach(function (c) {
+    ((C.colorPhotos || {})[c.id] || []).slice(0, 4).forEach(function (n, i) { if (n) picks[c.id + (i + 1)] = n; });
+  });
+
+  // Color for each photo: what the build detected, then fixes from config, then fixes made here
+  var baseColor = {};
+  var colorEdits = {};
   try {
     var saved = JSON.parse(localStorage.getItem(KEY) || 'null');
-    if (saved) Object.keys(saved).forEach(function (k) { if (saved[k]) picks[k] = saved[k]; });
+    if (saved) {
+      Object.keys(saved).forEach(function (k) {
+        if (k === '_colors') colorEdits = saved._colors || {};
+        else if (saved[k]) picks[k] = saved[k];
+      });
+    }
   } catch (e) { /* storage blocked */ }
 
   var shotsEl = document.querySelector('[data-shots]');
@@ -102,14 +130,18 @@
   var countEl = document.querySelector('[data-count]');
   var msgEl = document.querySelector('[data-msg]');
   var photos = [];
+  var filter = '';
 
+  function colorOf(name) {
+    return colorEdits[name] !== undefined ? colorEdits[name] : (baseColor[name] || '');
+  }
   function roleOf(name) {
     for (var k in picks) if (picks[k] === name) return k;
     return '';
   }
-  function labelOf(id) {
-    for (var i = 0; i < ROLES.length; i++) if (ROLES[i].id === id) return ROLES[i].label;
-    return id;
+  function roleById(id) {
+    for (var i = 0; i < ROLES.length; i++) if (ROLES[i].id === id) return ROLES[i];
+    return null;
   }
 
   function renderRoles() {
@@ -125,6 +157,14 @@
     countEl.textContent = filled + ' of ' + ROLES.length + ' spots filled';
   }
 
+  function option(sel, value, text, selected) {
+    var o = document.createElement('option');
+    o.value = value;
+    o.textContent = text;
+    if (selected) o.selected = true;
+    sel.appendChild(o);
+  }
+
   function renderShots() {
     shotsEl.innerHTML = '';
     if (!photos.length) {
@@ -132,6 +172,8 @@
       return;
     }
     photos.forEach(function (p) {
+      var color = colorOf(p.name);
+      if (filter && color !== filter) return;
       var role = roleOf(p.name);
       var card = document.createElement('div');
       card.className = 'shot' + (role ? ' is-picked' : '');
@@ -147,25 +189,36 @@
       if (role) {
         var tag = document.createElement('span');
         tag.className = 'tag';
-        tag.textContent = labelOf(role);
+        tag.textContent = (roleById(role) || {}).label || role;
         link.appendChild(tag);
       }
+
+      var meta = document.createElement('div');
+      meta.className = 'shot-meta';
       var name = document.createElement('span');
       name.className = 'shot-name';
       name.textContent = p.name;
+      var badge = document.createElement('span');
+      badge.className = 'shot-color';
+      if (colorById[color]) {
+        var dot = document.createElement('span');
+        dot.className = 'dot';
+        dot.style.backgroundColor = (colorById[color].swatch) || ((window.MICHE_PHOTOS || {}).swatches || {})[color] || '#888888';
+        badge.appendChild(dot);
+        badge.appendChild(document.createTextNode(colorById[color].name));
+      } else {
+        badge.textContent = 'Hidden from product page';
+      }
+      meta.appendChild(name);
+      meta.appendChild(badge);
+
       var sel = document.createElement('select');
       sel.id = 'use-' + p.name;
       sel.setAttribute('aria-label', 'Use ' + p.name + ' as');
-      var none = document.createElement('option');
-      none.value = '';
-      none.textContent = 'Use as…';
-      sel.appendChild(none);
+      option(sel, '', 'Use as…', !role);
       ROLES.forEach(function (r) {
-        var o = document.createElement('option');
-        o.value = r.id;
-        o.textContent = r.label + (picks[r.id] && picks[r.id] !== p.name ? ' (replace ' + picks[r.id] + ')' : '');
-        if (role === r.id) o.selected = true;
-        sel.appendChild(o);
+        if (r.color && r.color !== color) return;
+        option(sel, r.id, r.label + (picks[r.id] && picks[r.id] !== p.name ? ' (replace ' + picks[r.id] + ')' : ''), role === r.id);
       });
       sel.addEventListener('change', function () {
         var current = roleOf(p.name);
@@ -175,22 +228,59 @@
         renderRoles();
         renderShots();
       });
+
+      var csel = document.createElement('select');
+      csel.id = 'color-' + p.name;
+      csel.setAttribute('aria-label', 'Color of ' + p.name);
+      COLORS.forEach(function (c) { option(csel, c.id, 'Color: ' + c.name, color === c.id); });
+      option(csel, 'none', 'Hide from product page', !colorById[color]);
+      csel.addEventListener('change', function () {
+        var v = csel.value === 'none' ? 'none' : csel.value;
+        if ((baseColor[p.name] || 'none') === v) delete colorEdits[p.name];
+        else colorEdits[p.name] = v;
+        // Drop it from a color-specific spot that no longer matches
+        var current = roleOf(p.name);
+        var r = roleById(current);
+        if (r && r.color && r.color !== v) delete picks[current];
+        msgEl.textContent = '';
+        renderRoles();
+        renderShots();
+      });
+
       card.appendChild(link);
-      card.appendChild(name);
+      card.appendChild(meta);
       card.appendChild(sel);
+      card.appendChild(csel);
       shotsEl.appendChild(card);
     });
+    if (!shotsEl.children.length) shotsEl.innerHTML = '<p class="empty">No photos in this color.</p>';
   }
+
+  document.querySelectorAll('[data-filter]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      filter = btn.getAttribute('data-filter');
+      document.querySelectorAll('[data-filter]').forEach(function (b) { b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); });
+      renderShots();
+    });
+  });
 
   function picksText() {
     var lines = ['Miche photo picks:'];
     ROLES.forEach(function (r) { if (picks[r.id]) lines.push(r.id + ': ' + picks[r.id]); });
+    var fixes = Object.keys(colorEdits).sort();
+    if (fixes.length) {
+      lines.push('Color fixes:');
+      fixes.forEach(function (n) { lines.push(n + ': ' + colorEdits[n]); });
+    }
     return lines.join('\n');
   }
 
   document.querySelector('[data-preview]').addEventListener('click', function () {
     try {
-      localStorage.setItem(KEY, JSON.stringify(picks));
+      var out = {};
+      Object.keys(picks).forEach(function (k) { out[k] = picks[k]; });
+      out._colors = colorEdits;
+      localStorage.setItem(KEY, JSON.stringify(out));
       window.location.href = '/';
     } catch (e) {
       msgEl.textContent = "This browser won't save the preview. Copy the picks instead.";
@@ -207,14 +297,25 @@
     }
   });
 
-  fetch('/photos.json', { cache: 'no-store' })
-    .then(function (r) { return r.ok ? r.json() : { photos: [] }; })
-    .catch(function () { return { photos: [] }; })
-    .then(function (data) {
-      photos = (data && data.photos) || [];
-      renderRoles();
-      renderShots();
+  function start(data) {
+    photos = (data && data.photos) || [];
+    var cfgFix = C.colorOverrides || {};
+    photos.forEach(function (p) {
+      var c = cfgFix[p.name] !== undefined ? cfgFix[p.name] : p.color;
+      baseColor[p.name] = colorById[c] ? c : 'none';
     });
+    renderRoles();
+    renderShots();
+  }
+
+  if (window.MICHE_PHOTOS && window.MICHE_PHOTOS.photos) {
+    start(window.MICHE_PHOTOS);
+  } else {
+    fetch('/photos.json', { cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.json() : { photos: [] }; })
+      .catch(function () { return { photos: [] }; })
+      .then(start);
+  }
 })();
 </script>
 </body>

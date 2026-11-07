@@ -1,6 +1,6 @@
 # Miche — Drop 001 site
 
-Static site for the Volt Set: a home page (`index.html`) and a product page (`product.html`). No build step. Vercel serves the files as-is, and every push to `main` redeploys.
+Site for the Miche Fitted Set (neon and pink): a home page (`index.html`), a product page (`product.html`) and a photo picker (`/photos`). Every push to `main` redeploys on Vercel. The build (`scripts/build.mjs`) pulls the shoot photos from Dropbox, shrinks them, and sorts each one into neon or pink.
 
 ## Deploy on Vercel (one time)
 
@@ -24,7 +24,7 @@ Put image files in `/images`.
 
 - **Product page:** set each photo's `src` in `config.js` → `photos`, e.g. `'/images/set-front.jpg'`.
 - **Home page and other spots:** each striped placeholder is a `<div class="ph …">`. Replace it with an image, keeping the ratio class, for example:
-  `<img class="photo r-45" src="/images/hero.jpg" alt="Volt set on body">`
+  `<img class="photo r-45" src="/images/hero.jpg" alt="Fitted set on body">`
 
 ## Selling (connect Shopify)
 
@@ -34,6 +34,14 @@ This site doesn't take payments itself. "Buy now" sends the customer to Shopify 
 - `variants`: the Shopify variant ID for each piece and size
 
 Until then, "Buy now" tells visitors checkout isn't open yet.
+
+## Colors (neon and pink)
+
+The product page has a button for each color in `config.js` → `colorways`. Tapping one shows only that color's photos.
+
+- The build sorts every shoot photo by color automatically. If one lands in the wrong color, fix it at `/photos` (second menu under the photo) or in `config.js` → `colorOverrides`.
+- `colorPhotos` sets which photos show first for each color; more photos of that color fill in up to `galleryLimit`.
+- Shopify variant IDs are set per color in `variants`.
 
 ## Discount popup (spin the wheel / scratch card)
 
