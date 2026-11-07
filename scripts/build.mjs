@@ -116,12 +116,102 @@ async function pullPhotos() {
   return cached.photos;
 }
 
+/*
+  Colorway detection. Looks at the middle of each photo (where the outfit is) and counts
+  neon yellow-green pixels and pink pixels. A photo is tagged with a color when that color
+  clearly dominates; otherwise it's left untagged. Fixes go in config.js (colorOverrides).
+*/
+const COLOR_RULES = {
+  neon: (h, s, v) => h >= 55 && h <= 95 && s >= 0.45 && v >= 0.45,
+  pink: (h, s, v) => h >= 285 && h <= 350 && s >= 0.2 && v >= 0.3
+};
+
+function toHsv(r, g, b) {
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0;
+  if (d) {
+    if (max === r) h = 60 * (((g - b) / d) % 6);
+    else if (max === g) h = 60 * ((b - r) / d + 2);
+    else h = 60 * ((r - g) / d + 4);
+  }
+  if (h < 0) h += 360;
+  return [h, max ? d / max : 0, max];
+}
+
+async function colorStats(file) {
+  const meta = await sharp(file).metadata();
+  const width = Math.round(meta.width * 0.7), height = Math.round(meta.height * 0.8);
+  const { data, info } = await sharp(file)
+    .extract({ left: Math.round((meta.width - width) / 2), top: Math.round((meta.height - height) / 2), width, height })
+    .resize(90, 120, { fit: 'fill' }).removeAlpha().raw()
+    .toBuffer({ resolveWithObject: true });
+  const counts = {}, sums = {};
+  for (const c of Object.keys(COLOR_RULES)) { counts[c] = 0; sums[c] = [0, 0, 0, 0]; }
+  let total = 0;
+  for (let i = 0; i < data.length; i += info.channels) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+    const [h, s, v] = toHsv(r / 255, g / 255, b / 255);
+    total++;
+    for (const c of Object.keys(COLOR_RULES)) {
+      if (COLOR_RULES[c](h, s, v)) {
+        counts[c]++;
+        sums[c][0] += r; sums[c][1] += g; sums[c][2] += b; sums[c][3]++;
+        break;
+      }
+    }
+  }
+  const share = {};
+  for (const c of Object.keys(counts)) share[c] = total ? counts[c] / total : 0;
+  return { share, sums };
+}
+
+function classify(share) {
+  const [a, b] = Object.keys(share).sort((x, y) => share[y] - share[x]);
+  if (share[a] >= 0.02 && share[a] >= 3 * share[b]) return a;
+  return '';
+}
+
+const hex = (n) => Math.round(n).toString(16).padStart(2, '0');
+
+async function tagColors(photos) {
+  const swatchSums = {};
+  for (const p of photos) {
+    try {
+      const { share, sums } = await colorStats(path.join(OUT, 'images', 'shoot', 'thumb', p.name + '.jpg'));
+      p.color = classify(share);
+      for (const c of Object.keys(share)) p[c] = Math.round(share[c] * 1000) / 1000;
+      if (p.color) {
+        const acc = swatchSums[p.color] || (swatchSums[p.color] = [0, 0, 0, 0]);
+        const s = sums[p.color];
+        for (let k = 0; k < 4; k++) acc[k] += s[k];
+      }
+    } catch (e) {
+      p.color = '';
+      console.warn(`  color check skipped for ${p.name}: ${e.message}`);
+    }
+  }
+  const swatches = {};
+  for (const c of Object.keys(swatchSums)) {
+    const [r, g, b, n] = swatchSums[c];
+    if (n) swatches[c] = '#' + hex(r / n) + hex(g / n) + hex(b / n);
+  }
+  const tally = {};
+  for (const p of photos) tally[p.color || 'untagged'] = (tally[p.color || 'untagged'] || 0) + 1;
+  console.log('Colorways found:', JSON.stringify(tally), 'swatches:', JSON.stringify(swatches));
+  return swatches;
+}
+
 await copySite();
 let photos = [];
+let swatches = {};
 try {
   photos = await pullPhotos();
+  swatches = await tagColors(photos);
 } catch (e) {
   console.warn(`Photos skipped: ${e.message}`);
 }
-await writeFile(path.join(OUT, 'photos.json'), JSON.stringify({ photos }));
+const photoData = { photos, swatches };
+await writeFile(path.join(OUT, 'photos.json'), JSON.stringify(photoData));
+// Same data as a script, so pages can use it right away without waiting on a fetch
+await writeFile(path.join(OUT, 'photos.js'), 'window.MICHE_PHOTOS = ' + JSON.stringify(photoData) + ';\n');
 console.log(`Built the site with ${photos.length} shoot photos.`);
