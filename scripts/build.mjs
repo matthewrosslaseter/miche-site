@@ -38,22 +38,28 @@ function zipUrl(url) {
 
 function processZip(zipPath) {
   return new Promise((resolve, reject) => {
-    yauzl.open(zipPath, { lazyEntries: true }, (err, zip) => {
+    // decodeStrings: false skips yauzl's strict name check; Dropbox zips include a bare "/" entry
+    yauzl.open(zipPath, { lazyEntries: true, decodeStrings: false }, (err, zip) => {
       if (err) return reject(err);
       const out = [];
       zip.on('entry', (entry) => {
-        const base = path.basename(entry.fileName);
+        const fileName = Buffer.isBuffer(entry.fileName) ? entry.fileName.toString('utf8') : String(entry.fileName);
+        const base = path.basename(fileName);
         const isImage = /\.(jpe?g|png|webp|heic)$/i.test(base);
-        if (entry.fileName.endsWith('/') || base.startsWith('._') || entry.fileName.includes('__MACOSX') || !isImage) {
+        if (fileName.endsWith('/') || base.startsWith('._') || fileName.includes('__MACOSX') || !isImage) {
           zip.readEntry();
           return;
         }
         zip.openReadStream(entry, async (err2, stream) => {
           if (err2) return reject(err2);
           try {
-            const chunks = [];
-            for await (const chunk of stream) chunks.push(chunk);
-            const buf = Buffer.concat(chunks);
+            // Plain events: async iteration stalls on stored (uncompressed) entries, which Dropbox zips use
+            const buf = await new Promise((done, fail) => {
+              const chunks = [];
+              stream.on('data', (c) => chunks.push(c));
+              stream.on('end', () => done(Buffer.concat(chunks)));
+              stream.on('error', fail);
+            });
             const name = base.replace(/\.[^.]+$/, '').replace(/[^A-Za-z0-9_-]/g, '-');
             const full = await sharp(buf).rotate()
               .resize({ width: FULL_PX, height: FULL_PX, fit: 'inside', withoutEnlargement: true })
