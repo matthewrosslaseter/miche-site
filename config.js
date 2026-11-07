@@ -24,6 +24,14 @@ window.MICHE_CONFIG = {
     pants:  { XS: '', S: '', M: '', L: '' }
   },
 
+  // Shoot photos pulled from the Dropbox folder. Pick them at /photos on the site,
+  // then put each photo's name here (e.g. hero: 'IMG_3207'). Empty = striped placeholder.
+  shoot: {
+    hero: '', set: '', zipup: '', pants: '', macro: '',
+    front: '', back: '', detail: '', onbody: '',
+    wild1: '', wild2: '', wild3: ''
+  },
+
   // Product page photos. Put the image files in the /images folder, then fill in each src,
   // e.g. src: '/images/set-front.jpg'. Empty src shows the striped placeholder.
   photos: [

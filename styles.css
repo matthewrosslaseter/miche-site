@@ -96,7 +96,7 @@ button { font: inherit; }
   padding: 20px; text-align: center; color: #9A9A9A; font-size: 13px; line-height: 1.4;
 }
 .ph b { font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #D0D0D0; }
-.photo { width: 100%; height: 100%; object-fit: cover; }
+img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-fit: cover; background: #151515; }
 .r-45 { aspect-ratio: 4 / 5; }
 .r-54 { aspect-ratio: 5 / 4; }
 .r-11 { aspect-ratio: 1 / 1; }
@@ -333,3 +333,15 @@ tbody td { color: var(--muted); }
 /* Keep scrolled content out from under a phone's status bar */
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 25; background: var(--bg); }
 caption { caption-side: top; text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg); background: #141414; border-bottom: 1px solid var(--line-2); }
+
+/* Thumbnails that show a shoot photo keep their label readable */
+.thumb.has-photo { color: #FFFFFF; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9); }
+
+/* Shown only on the phone that is previewing photo picks */
+.preview-pill {
+  position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 95;
+  display: flex; align-items: center; gap: 12px; padding: 6px 6px 6px 14px;
+  background: var(--fg); color: var(--ink); font-size: 13px; font-weight: 700; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.preview-pill a { color: var(--ink); }
+.preview-pill button { min-height: 36px; padding: 0 12px; border: 0; background: var(--ink); color: var(--fg); font-weight: 700; cursor: pointer; }

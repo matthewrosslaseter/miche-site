@@ -7,6 +7,22 @@
   var photos = C.photos || [];
   var shop = (C.shopDomain || '').replace(/^https?:\/\//, '').replace(/\/+$/, '');
 
+  // Shoot photos: names from config.shoot, or a preview picked at /photos on this device
+  var shoot = {};
+  Object.keys(C.shoot || {}).forEach(function (k) { shoot[k] = C.shoot[k]; });
+  var shootPreview = null;
+  try { shootPreview = JSON.parse(window.localStorage.getItem('miche_shoot_preview') || 'null'); } catch (e) { shootPreview = null; }
+  if (shootPreview) Object.keys(shootPreview).forEach(function (k) { if (shootPreview[k]) shoot[k] = shootPreview[k]; });
+  function shootSrc(name, thumb) {
+    return name ? '/images/shoot/' + (thumb ? 'thumb/' : '') + encodeURIComponent(name) + '.jpg' : '';
+  }
+  var productRoles = ['front', 'back', 'detail', 'onbody'];
+  photos = photos.map(function (p, i) {
+    var name = shoot[productRoles[i]];
+    if (p.src || !name) return p;
+    return { label: p.label, note: p.note, alt: p.alt, src: shootSrc(name), thumb: shootSrc(name, true) };
+  });
+
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 
@@ -18,6 +34,32 @@
     var p = prices[el.getAttribute('data-price')];
     if (p) el.textContent = p;
   });
+
+  // Swap striped placeholders for shoot photos
+  $$('[data-role]').forEach(function (el) {
+    var name = shoot[el.getAttribute('data-role')];
+    if (!name) return;
+    var img = document.createElement('img');
+    var ratio = (el.className.match(/r-\d+/) || [''])[0];
+    img.className = 'photo ' + ratio;
+    img.src = shootSrc(name);
+    img.alt = el.getAttribute('data-alt') || 'Miche Volt set';
+    img.decoding = 'async';
+    if (el.getAttribute('data-role') !== 'hero') img.loading = 'lazy';
+    el.parentNode.replaceChild(img, el);
+  });
+
+  // Let Matt know he's looking at his own photo preview, with a way out
+  if (shootPreview) {
+    var pill = document.createElement('div');
+    pill.className = 'preview-pill';
+    pill.innerHTML = '<span>Showing your photo picks</span> <a href="/photos">Edit</a> <button type="button">Clear</button>';
+    pill.querySelector('button').addEventListener('click', function () {
+      try { window.localStorage.removeItem('miche_shoot_preview'); } catch (e) { /* ignore */ }
+      window.location.reload();
+    });
+    document.body.appendChild(pill);
+  }
 
   // Bag link → Shopify cart once the store is connected
   $$('[data-cart-link]').forEach(function (el) {
@@ -95,7 +137,7 @@
     if (v.src) {
       mainPhoto.className = 'r-45';
       var img = document.createElement('img');
-      img.className = 'photo';
+      img.className = 'photo r-45';
       img.src = v.src;
       img.alt = v.alt || v.label;
       mainPhoto.appendChild(img);
@@ -130,6 +172,16 @@
       render();
     }
   };
+
+  $$('[data-view]').forEach(function (btn) {
+    var p = photos[Number(btn.getAttribute('data-view'))];
+    if (p && (p.thumb || p.src)) {
+      btn.style.backgroundImage = 'url("' + (p.thumb || p.src) + '")';
+      btn.style.backgroundSize = 'cover';
+      btn.style.backgroundPosition = 'center';
+      btn.classList.add('has-photo');
+    }
+  });
 
   $$('[data-view]').forEach(function (btn) {
     btn.addEventListener('click', function () {
