@@ -141,18 +141,14 @@
         input.focus();
         return;
       }
-      if (!C.signupEndpoint) {
+      var signup = window.MicheSignup;
+      if (!signup || !signup.ready()) {
         msg.textContent = "Signups aren't open yet. Check back soon.";
         return;
       }
       button.disabled = true;
       msg.textContent = 'Sending…';
-      fetch(C.signupEndpoint, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email })
-      }).then(function (res) {
-        if (!res.ok) throw new Error('Signup failed');
+      signup.subscribe({ email: email, source: 'Website: drop alerts form' }).then(function () {
         msg.textContent = "You're on the list.";
         form.reset();
       }).catch(function () {

@@ -56,15 +56,19 @@ window.MICHE_CONFIG = {
   },
   galleryLimit: 12,
 
-  // Email signup: paste the form endpoint from an email tool (for example a Formspree form URL).
-  // Leave empty until it's connected — the form will say signups aren't open yet.
-  // The discount popup sends to this same endpoint: { email, phone, sms_consent, source }.
-  signupEndpoint: '',
+  // EMAIL + TEXT SIGN-UPS (Klaviyo)
+  // In Klaviyo: Settings → Account → API keys → Public API key (6 characters, safe to put here).
+  // Lists & segments → open the sign-up list → the list ID is in the page address.
+  // Leave either empty and sign-ups are not saved anywhere (forms say sign-ups aren't open yet).
+  klaviyo: {
+    publicKey: '',
+    listId: ''
+  },
 
   // DISCOUNT POPUP
   // Preview it any time, without sending anything, by adding ?popup=wheel or ?popup=scratch
   // to the site address. When enabled, it opens for visitors after delaySeconds on the site.
-  // Until signupEndpoint is set, emails and phone numbers are NOT saved anywhere.
+  // Until the Klaviyo keys above are set, emails and phone numbers are NOT saved anywhere.
   popup: {
     enabled: true,
     style: 'scratch',     // 'wheel' or 'scratch'
@@ -86,7 +90,7 @@ window.MICHE_CONFIG = {
     ],
 
     // Links shown in the text-message consent line.
-    privacyUrl: '[PRIVACY POLICY URL]',
-    termsUrl: '[TERMS URL]'
+    privacyUrl: '/privacy',
+    termsUrl: '/terms'
   }
 };

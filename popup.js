@@ -77,10 +77,11 @@
               '<input id="pop-phone" name="phone" type="tel" autocomplete="tel-national" inputmode="tel" placeholder="(251) 555-0123" required>' +
               '<label class="pop-consent" for="pop-consent">' +
                 '<input id="pop-consent" type="checkbox" name="sms_consent" required>' +
-                '<span>By checking this box and signing up, you agree to receive recurring automated marketing texts (drop alerts and promos) and emails from Miche at the number and email provided. Consent is not a condition of purchase. Msg frequency varies. Msg &amp; data rates may apply. Reply STOP to unsubscribe, HELP for help. ' +
-                '<a href="' + esc(safeUrl(P.privacyUrl)) + '">Privacy Policy</a> · <a href="' + esc(safeUrl(P.termsUrl)) + '">Terms</a></span>' +
+                '<span><strong>Text me drop alerts and deals.</strong> By checking this box, you agree to receive recurring automated marketing text messages from Miche at the number provided. Consent is not a condition of purchase. Msg frequency varies. Msg &amp; data rates may apply. Reply HELP for help, STOP to cancel. ' +
+                '<a href="' + esc(safeUrl(P.termsUrl)) + '">Terms</a> · <a href="' + esc(safeUrl(P.privacyUrl)) + '">Privacy Policy</a></span>' +
               '</label>' +
               '<button class="btn btn-accent pop-submit" type="submit">' + unlock + '</button>' +
+              '<p class="pop-fine">You\'ll also get Miche emails about drops and deals. Unsubscribe anytime.</p>' +
               '<p class="pop-msg" role="status" aria-live="polite"></p>' +
             '</form>' +
             '<button class="pop-skip" type="button" data-close>No thanks</button>' +
@@ -252,17 +253,18 @@
       if (!phone) { formMsg.textContent = 'Enter a 10-digit US phone number.'; phoneInput.focus(); return; }
       if (!consentInput.checked) { formMsg.textContent = 'Check the box to get texts and your code.'; consentInput.focus(); return; }
 
-      // Preview, or no email/text tool connected yet: nothing to send to, so go straight to the game
-      if (preview || !C.signupEndpoint) { formMsg.textContent = ''; afterForm(); return; }
+      // Preview, or Klaviyo not connected yet: nothing to send to, so go straight to the code
+      var signup = window.MicheSignup;
+      if (preview || !signup || !signup.ready()) { formMsg.textContent = ''; afterForm(); return; }
 
       submitBtn.disabled = true;
       formMsg.textContent = 'Unlocking…';
-      fetch(C.signupEndpoint, {
-        method: 'POST',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email, phone: phone, sms_consent: true, source: 'popup-' + style, page: window.location.pathname })
-      }).then(function (res) {
-        if (!res.ok) throw new Error('Signup failed');
+      signup.subscribe({
+        email: email,
+        phone: phone,
+        sms: true,
+        source: isWheel ? 'Website popup: spin to win' : 'Website popup: mystery discount'
+      }).then(function () {
         joined = true;
         store.set(KEY_JOINED, '1');
         formMsg.textContent = '';

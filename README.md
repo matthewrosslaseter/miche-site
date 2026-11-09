@@ -43,16 +43,20 @@ The product page has a button for each color in `config.js` → `colorways`. Tap
 - `colorPhotos` sets which photos show first for each color; more photos of that color fill in up to `galleryLimit`.
 - Shopify variant IDs are set per color in `variants`.
 
-## Discount popup (spin the wheel / scratch card)
+## Discount popup (mystery discount scratch card)
 
-Visitors enter email + phone, agree to texts, then spin a wheel or scratch a card to reveal a discount code. The code is saved in their browser and added to Shopify checkout when they tap Buy now.
+Opens 10 seconds into a visit. Visitors scratch the card to reveal 10% off, then enter email + phone and check the texting box to get the code (MICHE10). The code is saved in their browser and added to Shopify checkout when they tap Buy now.
 
-- **Preview any time** (nothing is sent or saved): add `?popup=wheel` or `?popup=scratch` to the site address.
-- **Turn it on for visitors:** in `config.js` → `popup`, set `enabled: true`, pick `style: 'wheel'` or `'scratch'`, and set `signupEndpoint`. It stays off until both are set, so no one's info goes nowhere.
-- **Prizes and odds:** edit `popup.prizes`. Each code must also exist in Shopify (Discounts → Create discount) or it won't work at checkout. `weight` controls how often each prize comes up.
-- **Text-message consent:** the checkbox line covers the standard disclosures. Add real links for `privacyUrl` and `termsUrl`. The texting tool (Klaviyo, Postscript, Attentive, etc.) handles sending and STOP/HELP replies.
-- The popup sends `{ email, phone, sms_consent, source, page }` as JSON to `signupEndpoint`.
+- **Preview any time** (nothing is sent or saved): add `?popup=scratch` or `?popup=wheel` to the site address.
+- **Settings:** `config.js` → `popup` (style, delay, the scratch prize, wheel prizes). Every code must also exist in Shopify (Discounts → Create discount) or it won't work at checkout.
 
-## Email signup
+## Email + text sign-ups (Klaviyo)
 
-Paste a form endpoint from an email tool (for example a Formspree form URL) into `signupEndpoint` in `config.js`. Until then, the form tells visitors signups aren't open yet.
+The popup and the footer "Get the drop first" form send sign-ups to Klaviyo (`signup.js`). Email consent and text consent are recorded separately; texts only when the visitor checks the texting box.
+
+1. Create a free Klaviyo account for Miche, then add texting: Settings → SMS → set up a US toll-free number and submit it for carrier approval. Use `https://miche-site.vercel.app/terms` and `/privacy` when it asks.
+2. Create a list (for example "Website sign-ups") and set it to single opt-in.
+3. Put the **public API key** (6 characters) and the **list ID** in `config.js` → `klaviyo`.
+4. In Klaviyo, build a Welcome flow triggered by joining that list: an email and a text with the code MICHE10.
+
+Until step 3 is done, nothing is saved: the popup still shows the code, and the footer form says sign-ups aren't open yet. If texting isn't approved yet, the email sign-up still goes through and the phone number is saved on the profile.

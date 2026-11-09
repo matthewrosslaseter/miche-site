@@ -16,7 +16,7 @@ import yauzl from 'yauzl';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'dist');
-const SITE_FILES = ['index.html', 'product.html', 'photos.html', 'styles.css', 'config.js', 'app.js', 'popup.js', 'favicon.svg'];
+const SITE_FILES = ['index.html', 'product.html', 'photos.html', 'privacy.html', 'terms.html', 'styles.css', 'config.js', 'signup.js', 'app.js', 'popup.js', 'favicon.svg'];
 // Kept between builds by Vercel's build cache, so the folder is only downloaded again when the link or VERSION changes
 const CACHE = path.join(ROOT, 'node_modules', '.cache', 'miche-photos');
 const VERSION = '1';
