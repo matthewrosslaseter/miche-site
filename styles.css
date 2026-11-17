@@ -185,6 +185,8 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 }
 .hero-fallback, .hero-fallback > *, .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .hero-fallback .ph { border: 0; }
+/* Shoot photos are portrait: keep faces in frame when the card is wider than the photo */
+.hero-fallback > * { object-position: 50% 22%; }
 .hero-video { opacity: 0; transition: opacity 0.9s ease; background: transparent; }
 .is-playing > .hero-video, .is-playing > .closer-video { opacity: 1; }
 .hero-shade {
