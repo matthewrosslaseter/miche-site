@@ -309,6 +309,8 @@
     setPressed($$('[data-color]'), function (b) { return b.getAttribute('data-color') === state.color; });
     setPressed($$('[data-size]'), function (b) { return b.getAttribute('data-size') === state.size; });
     if (!hashRouting) document.title = name + ' in ' + colorName + ' — Miche';
+    // Lets the "In the wild" clips follow the color picker (clips.js)
+    try { document.dispatchEvent(new CustomEvent('miche:color', { detail: state.color })); } catch (e) { /* very old browser */ }
   }
 
   window.MicheProduct = {

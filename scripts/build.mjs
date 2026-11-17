@@ -18,7 +18,7 @@ import { makeFilm } from './film.mjs';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'dist');
-const SITE_FILES = ['index.html', 'product.html', 'photos.html', 'privacy.html', 'terms.html', 'styles.css', 'config.js', 'signup.js', 'app.js', 'home.js', 'popup.js', 'favicon.svg'];
+const SITE_FILES = ['index.html', 'product.html', 'photos.html', 'privacy.html', 'terms.html', 'styles.css', 'config.js', 'signup.js', 'app.js', 'home.js', 'clips.js', 'popup.js', 'favicon.svg'];
 // Kept between builds by Vercel's build cache, so the folder is only downloaded again when the link or VERSION changes
 const CACHE = path.join(ROOT, 'node_modules', '.cache', 'miche-photos');
 const VERSION = '1';
@@ -30,6 +30,11 @@ async function copySite() {
   await mkdir(OUT, { recursive: true });
   for (const f of SITE_FILES) await cp(path.join(ROOT, f), path.join(OUT, f));
   if (existsSync(path.join(ROOT, 'images'))) await cp(path.join(ROOT, 'images'), path.join(OUT, 'images'), { recursive: true });
+  // Real footage: the clips and the hero reel (already web-sized by scripts/clips.py)
+  if (existsSync(path.join(ROOT, 'media', 'clips'))) await cp(path.join(ROOT, 'media', 'clips'), path.join(OUT, 'media', 'clips'), { recursive: true });
+  for (const f of ['reel-tall.mp4', 'reel-tall.jpg', 'reel-wide.mp4', 'reel-wide.jpg']) {
+    if (existsSync(path.join(ROOT, 'media', f))) await cp(path.join(ROOT, 'media', f), path.join(OUT, 'media', f));
+  }
 }
 
 function zipUrl(url) {

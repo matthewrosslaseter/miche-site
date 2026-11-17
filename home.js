@@ -80,11 +80,14 @@
     if (fs) fs.hidden = false;
   }
 
-  // Background film (hero + closer): muted loop, plays only while on screen, with a pause button
-  function backgroundFilm(video, toggle) {
-    if (!film || !video) return;
+  // Real footage cut into a short loop (made by scripts/clips.py); plays behind the hero
+  var reel = { tall: '/media/reel-tall.mp4', wide: '/media/reel-wide.mp4', posterTall: '/media/reel-tall.jpg', posterWide: '/media/reel-wide.jpg' };
+
+  // Background video (hero + closer): muted loop, plays only while on screen, with a pause button
+  function backgroundFilm(video, toggle, srcs) {
+    if (!srcs || !video) return;
     var card = video.parentNode;
-    video.poster = filmPoster();
+    video.poster = wide() ? srcs.posterWide : srcs.posterTall;
     var userPaused = reduce || saveData;
     var visible = false;
     var started = false;
@@ -96,7 +99,7 @@
     }
     function play() {
       if (userPaused || !visible) return;
-      if (!started) { video.src = filmSrc(); started = true; }
+      if (!started) { video.src = wide() ? srcs.wide : srcs.tall; started = true; }
       var p = video.play();
       if (p && p.catch) p.catch(function () { sync(); });
     }
@@ -115,8 +118,8 @@
     }, { threshold: 0.15 });
     sync();
   }
-  backgroundFilm($('[data-hero-video]'), $('[data-hero-toggle]'));
-  backgroundFilm($('[data-closer-video]'), null);
+  backgroundFilm($('[data-hero-video]'), $('[data-hero-toggle]'), reel);
+  backgroundFilm($('[data-closer-video]'), null, film);
 
   // ---------- Film player (inline section + full-screen modal) ----------
   function fmt(t) {
@@ -409,6 +412,19 @@
       lurk.parentNode.hidden = true;
     } else {
       lurkPics.forEach(function (name) { lgrid.appendChild(img(name, '', { thumb: true })); });
+      // A few real clips hiding among the photos (silent previews; they play only while this section is on screen)
+      var MC = window.MicheClips;
+      var lurkVids = [];
+      if (MC && MC.previews && MC.all.length) {
+        var picks = ['clip-02', 'clip-05', 'clip-07'];
+        [1, 6, 10].forEach(function (slot, k) {
+          var c = MC.all.filter(function (x) { return x.file === picks[k]; })[0] || MC.all[k];
+          if (!c || !lgrid.children[slot]) return;
+          var v = MC.silentVideo(c);
+          lgrid.replaceChild(v, lgrid.children[slot]);
+          lurkVids.push(v);
+        });
+      }
       $('[data-lurk-hint]', lurk).textContent = mm('(hover: none)') ? 'Drag your finger around' : 'Move your cursor around';
 
       var COLS = 8, ROWS = 5, GOAL = Math.round(COLS * ROWS * 0.4);
@@ -488,7 +504,11 @@
       $('[data-lurk-skip]', lurk).addEventListener('click', reveal);
       window.addEventListener('resize', size);
       size();
-      onView(lurk, function (isIn) { lurkInView = isIn; if (isIn) go(); }, { threshold: 0.15 });
+      onView(lurk, function (isIn) {
+        lurkInView = isIn;
+        if (isIn) go();
+        lurkVids.forEach(function (v) { if (isIn) MC.playSilent(v); else v.pause(); });
+      }, { threshold: 0.15 });
     }
   }
 

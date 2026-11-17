@@ -56,6 +56,22 @@ window.MICHE_CONFIG = {
   },
   galleryLimit: 12,
 
+  // Home page "Out in it" clips: real footage, in this order. Files live in /media/clips
+  // (clip-01.mp4 + clip-01.jpg poster). color sets the tag and the "Shop" button: 'neon', 'pink' or 'both'.
+  // Delete a line to take a clip off the site.
+  clips: [
+    { file: 'clip-01', color: 'both' },
+    { file: 'clip-02', color: 'both' },
+    { file: 'clip-03', color: 'pink' },
+    { file: 'clip-04', color: 'both' },
+    { file: 'clip-05', color: 'both' },
+    { file: 'clip-06', color: 'pink' },
+    { file: 'clip-07', color: 'both' },
+    { file: 'clip-08', color: 'both' },
+    { file: 'clip-09', color: 'pink' },
+    { file: 'clip-10', color: 'both' }
+  ],
+
   // Home page "The details" section: one photo per step (script, fabric, fit, sizing).
   detailPhotos: ['IMG_3168', 'IMG_3166', 'IMG_3212', 'IMG_3176'],
 

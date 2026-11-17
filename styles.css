@@ -424,7 +424,8 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 .lurk {
   --x: 50%; --y: 45%; --r: 160px;
   position: relative; overflow: hidden; max-width: 1600px; margin: 0 auto;
-  height: clamp(560px, 84svh, 820px); border-radius: var(--radius); background: #050505;
+  /* Height follows the grid so every tile is a 2:3 portrait, the same shape as the photos (6 x 2 tiles here) */
+  aspect-ratio: 2 / 1; min-height: 520px; border-radius: var(--radius); background: #050505;
   touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 .lurk-grid {
@@ -471,8 +472,19 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 .lurk-found-title { margin: 0; font-size: 32px; font-weight: 500; letter-spacing: -0.04em; line-height: 1.05; }
 .lurk-found-sub { margin: 0 0 12px; color: var(--soft); }
 @keyframes lurkFound { from { opacity: 0; transform: translate(-50%, 18px); } to { opacity: 1; transform: translate(-50%, 0); } }
-@media (max-width: 899px) { .lurk-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); } }
-@media (max-width: 599px) { .lurk-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 4px; } }
+.lurk-grid video { width: 100%; height: 100%; min-height: 0; object-fit: cover; pointer-events: none; background: #050505; }
+/* Tablets: 4 x 3 tiles */
+@media (max-width: 899px) {
+  .lurk { aspect-ratio: 8 / 9; min-height: 0; }
+  .lurk-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
+}
+/* Phones: 3 x 4 tiles, the box gets taller instead of squashing the photos */
+@media (max-width: 599px) {
+  .lurk { aspect-ratio: 1 / 2; max-height: none; }
+  .lurk-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 4px; }
+  .lurk-copy { padding: 22px 20px; }
+  .lurk-copy .h2 { font-size: clamp(30px, 8.6vw, 38px); }
+}
 @media (prefers-reduced-motion: reduce) { .lurk-found { animation: none; } }
 
 /* ---------- Home: swipe row ---------- */
@@ -511,6 +523,74 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 .rcard-offer-top { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .rcard-offer-big { font-size: clamp(40px, 4vw, 52px); font-weight: 500; letter-spacing: -0.05em; line-height: 0.92; }
 .rcard-offer .rcard-label span { color: rgba(11, 11, 11, 0.7); }
+
+/* ---------- Home: clips (real footage) ---------- */
+.clips-section { padding-bottom: clamp(56px, 8vw, 104px); }
+.clips-side { display: flex; align-items: center; gap: 16px; }
+.clips-note { margin: 0; font-size: 14px; }
+.ccard { flex-basis: clamp(200px, 21vw, 280px); aspect-ratio: 9 / 16; padding: 14px; justify-content: flex-start; }
+.ccard::after { background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.35) 100%); z-index: 1; }
+.ccard-video { opacity: 0; transition: opacity 0.5s ease; }
+.ccard.is-playing .ccard-video { opacity: 1; }
+.ccard:hover .ccard-video { transform: scale(1.04); }
+.ccard-tag {
+  position: relative; z-index: 2; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px 6px 7px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: rgba(0, 0, 0, 0.42); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.ccard-tag .dot { width: 12px; height: 12px; }
+.ccard-tag .dot + .dot { margin-left: -9px; box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.6); }
+.ccard-play { top: auto; bottom: 14px; left: auto; right: 14px; transform: none; width: 44px; height: 44px; }
+.ccard-play svg { width: 16px; height: 16px; }
+.ccard:hover .ccard-play { transform: scale(1.08); }
+@media (max-width: 640px) {
+  .clips-note { display: none; }
+  .ccard { flex-basis: 58vw; }
+}
+
+/* Full-screen clip viewer */
+.clipview {
+  position: fixed; inset: 0; z-index: 130; display: flex; align-items: center; justify-content: center; gap: 24px;
+  background: rgba(0, 0, 0, 0.96);
+}
+.clipview[hidden] { display: none; }
+.clipview-stage {
+  position: relative; overflow: hidden; background: #000;
+  height: min(100svh - 48px, 900px); aspect-ratio: 9 / 16; max-width: 100vw; border-radius: 20px;
+}
+.clipview-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+.clipview-top {
+  position: absolute; z-index: 3; left: 0; right: 0; top: 0;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 28px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+}
+.clipview-bars { display: flex; gap: 4px; }
+.clipview-bars span { flex: 1; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
+.clipview-bars i { display: block; height: 100%; background: #fff; transform: scaleX(0); transform-origin: left; }
+.clipview-head { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.clipview-tag { flex: 1; font-size: 13px; font-weight: 600; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5); }
+.clipview-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer;
+  color: #fff; background: rgba(255, 255, 255, 0.16); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.clipview-btn:hover { background: rgba(255, 255, 255, 0.28); }
+.clipview-btn .i-off, .clipview.is-muted .clipview-btn .i-on { display: none; }
+.clipview.is-muted .clipview-btn .i-off { display: block; }
+.clipview-tap { position: absolute; inset: 0; z-index: 2; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.clipview-foot {
+  position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; display: flex; justify-content: center;
+  padding: 40px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+  transition: opacity 0.2s ease;
+}
+.clipview.is-held .clipview-top, .clipview.is-held .clipview-foot { opacity: 0; }
+.clipview-top { transition: opacity 0.2s ease; }
+.clipview-nav { flex: none; color: #fff; }
+@media (max-width: 640px), (max-aspect-ratio: 3 / 4) {
+  .clipview { background: #000; }
+  .clipview-stage { height: 100%; width: 100%; aspect-ratio: auto; border-radius: 0; }
+  .clipview-nav { display: none; }
+}
 
 /* ---------- Home: FAQ ---------- */
 .faq { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr); gap: 32px clamp(32px, 6vw, 96px); align-items: start; }
@@ -560,6 +640,12 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 }
 .closer-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.9s ease; }
 .closer-card .hero-shade { background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.72) 100%); }
+/* Phones: a tall portrait card (like the photos and film), with the words at the bottom so they don't sit on faces */
+@media (max-width: 599px) {
+  .closer-card { min-height: min(88svh, 168vw); align-items: flex-end; }
+  .closer-card .hero-shade { background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.55) 62%, rgba(0, 0, 0, 0.85) 100%); }
+  .closer-content { gap: 20px; padding-bottom: 28px; }
+}
 .closer-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 32px 20px; }
 .closer-title { margin: 0; font-size: clamp(60px, 12vw, 180px); font-weight: 500; letter-spacing: -0.06em; line-height: 0.88; }
 .closer-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -786,6 +872,26 @@ tbody td { color: var(--muted); }
 .pop-step.is-inline { margin-top: 4px; }
 .pop-step.is-inline > .eyebrow, .pop-step.is-inline > .pop-title { display: none; }
 .pop { overscroll-behavior: contain; }
+/* Phones: a scratch card shaped like a real card, sized to the screen instead of a fixed height */
+.scratch { height: auto; aspect-ratio: 1.6 / 1; max-height: 34svh; min-height: 150px; }
+@media (max-width: 480px) {
+  .pop { padding: 30px 20px 20px; }
+  .pop-title { font-size: clamp(40px, 12vw, 52px); }
+  .pop-step { gap: 12px; }
+}
+/* Phone turned sideways (short screens): tighter type, and the card sits beside the copy so nothing scrolls off */
+@media (max-height: 520px) and (orientation: landscape) {
+  .pop { max-width: 720px; padding: 18px 22px 16px; max-height: calc(100dvh - 20px); }
+  .pop-backdrop { padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .pop-preview { margin: 0 48px 10px; padding: 4px 8px; font-size: 11px; }
+  .pop-step { gap: 8px; }
+  .pop-title { font-size: 30px; }
+  .pop-step > .eyebrow { display: none; }
+  .pop-sub { font-size: 14px; }
+  .scratch { max-height: none; min-height: 0; height: min(40dvh, 170px); aspect-ratio: auto; }
+  .pop-skip { min-height: 36px; }
+  .wheel-wrap { width: min(220px, 52dvh); }
+}
 @media (prefers-reduced-motion: reduce) {
   .scratch-hint span { animation: none; left: calc(50% - 11px); }
   .scratch.is-revealed .scratch-prize-label { animation: none; }

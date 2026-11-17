@@ -429,12 +429,19 @@
       var ctx = canvas.getContext('2d', { willReadFrequently: true });
       var fctx = fx.getContext('2d');
       var dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
-      var w = card.clientWidth, h = card.clientHeight;
+      var w = 0, h = 0;
+      // Draws a fresh foil cover at the card's current size (again after a rotation, if nobody has scratched yet)
+      var paintCover = function () {
+      w = card.clientWidth; h = card.clientHeight;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      fctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = 'source-over';
       [canvas, fx].forEach(function (c) {
         c.width = Math.round(w * dpr);
         c.height = Math.round(h * dpr);
-        c.style.width = w + 'px';
-        c.style.height = h + 'px';
+        // Stretch with the card, so rotating the phone never leaves part of it uncovered
+        c.style.width = '100%';
+        c.style.height = '100%';
       });
       ctx.scale(dpr, dpr);
       fctx.scale(dpr, dpr);
@@ -468,12 +475,22 @@
 
       ctx.globalCompositeOperation = 'destination-out';
       ctx.fillStyle = '#000000';
+      };
+      paintCover();
+      var lastW = card.clientWidth, lastH = card.clientHeight;
+      window.addEventListener('resize', function () {
+        if (moves || done || card.clientWidth === 0) return;
+        if (Math.abs(card.clientWidth - lastW) < 2 && Math.abs(card.clientHeight - lastH) < 2) return;
+        lastW = card.clientWidth; lastH = card.clientHeight;
+        paintCover();
+      });
 
       var down = false, last = null, moves = 0, done = false, lastBuzz = 0;
       var particles = [], fxRunning = false;
       var pos = function (e) {
+        // In drawing units, which stay the same if the card changes size after a rotation
         var b = canvas.getBoundingClientRect();
-        return [e.clientX - b.left, e.clientY - b.top];
+        return [(e.clientX - b.left) * (w / (b.width || w)), (e.clientY - b.top) * (h / (b.height || h))];
       };
       // A slightly rough brush so the edges look scratched, not cut
       var dab = function (x, y) {
