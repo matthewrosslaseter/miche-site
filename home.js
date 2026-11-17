@@ -377,6 +377,121 @@
     }
   }
 
+  // ---------- Scroll progress: a thin neon line across the top ----------
+  var bar = $('[data-progress]');
+  if (bar) {
+    var ticking = false;
+    var paint = function () {
+      ticking = false;
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, window.scrollY / max) : 0).toFixed(4) + ')';
+    };
+    window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(paint); } }, { passive: true });
+    window.addEventListener('resize', paint);
+    paint();
+  }
+
+  // ---------- Lurk mode: photos hiding in the dark, a spotlight follows your cursor or finger ----------
+  var lurk = $('[data-lurk]');
+  if (lurk) {
+    var lgrid = $('[data-lurk-grid]', lurk);
+    var lurkPics = (function () {
+      // Start past the photos the color slideshow uses, so these feel like a find
+      var from = function (list) { return list.length >= 10 ? list.slice(4) : list; };
+      var n = from(D.galleryFor('neon')), p = from(D.galleryFor('pink')), out = [];
+      for (var i = 0; out.length < 12 && (i < n.length || i < p.length); i++) {
+        if (n[i]) out.push(n[i]);
+        if (p[i] && out.length < 12) out.push(p[i]);
+      }
+      return out;
+    })();
+    if (!lurkPics.length) {
+      lurk.parentNode.hidden = true;
+    } else {
+      lurkPics.forEach(function (name) { lgrid.appendChild(img(name, '', { thumb: true })); });
+      $('[data-lurk-hint]', lurk).textContent = mm('(hover: none)') ? 'Drag your finger around' : 'Move your cursor around';
+
+      var COLS = 8, ROWS = 5, GOAL = Math.round(COLS * ROWS * 0.4);
+      var seen = new Uint8Array(COLS * ROWS), seenCount = 0;
+      var meter = $('[data-lurk-meter]', lurk), foundCard = $('[data-lurk-found]', lurk);
+      var cur = { x: 0.5, y: 0.45 }, aimAt = { x: 0.5, y: 0.45 };
+      var radius = 160, lastUser = -1e9, t0 = performance.now();
+      var running = false, done = false, lurkInView = false;
+
+      var size = function () {
+        var b = lurk.getBoundingClientRect();
+        radius = Math.max(110, Math.min(230, Math.min(b.width, b.height) * 0.27));
+        if (!done) lurk.style.setProperty('--r', radius + 'px');
+      };
+      var mark = function (x, y) {
+        var b = lurk.getBoundingClientRect(), reach = radius * 0.7;
+        for (var row = 0; row < ROWS; row++) {
+          for (var col = 0; col < COLS; col++) {
+            var k = row * COLS + col;
+            if (seen[k]) continue;
+            var dx = ((col + 0.5) / COLS - x) * b.width, dy = ((row + 0.5) / ROWS - y) * b.height;
+            if (dx * dx + dy * dy < reach * reach) { seen[k] = 1; seenCount++; }
+          }
+        }
+        meter.style.width = Math.min(100, Math.round((seenCount / GOAL) * 100)) + '%';
+        if (seenCount >= GOAL) reveal();
+      };
+      var aim = function (cx, cy) {
+        var b = lurk.getBoundingClientRect();
+        aimAt.x = Math.max(0, Math.min(1, (cx - b.left) / b.width));
+        aimAt.y = Math.max(0, Math.min(1, (cy - b.top) / b.height));
+        lastUser = performance.now();
+        lurk.classList.add('is-touched');
+        go();
+      };
+      var frame = function (now) {
+        if (!lurkInView || done) { running = false; return; }
+        var idle = now - lastUser > 2200;
+        if (idle && !reduce) {
+          // Drift on its own until someone takes over, so phones see it moving right away
+          var t = (now - t0) / 1000;
+          aimAt.x = 0.5 + 0.34 * Math.sin(t * 0.43);
+          aimAt.y = 0.5 + 0.28 * Math.sin(t * 0.71 + 1.3);
+        }
+        var ease = reduce ? 1 : (idle ? 0.035 : 0.2);
+        cur.x += (aimAt.x - cur.x) * ease;
+        cur.y += (aimAt.y - cur.y) * ease;
+        lurk.style.setProperty('--x', (cur.x * 100).toFixed(2) + '%');
+        lurk.style.setProperty('--y', (cur.y * 100).toFixed(2) + '%');
+        if (!idle) mark(cur.x, cur.y);
+        if (reduce && idle) { running = false; return; }
+        requestAnimationFrame(frame);
+      };
+      var go = function () {
+        if (!running && lurkInView && !done) { running = true; requestAnimationFrame(frame); }
+      };
+      var reveal = function () {
+        if (done) return;
+        done = true;
+        lurk.classList.add('is-found');
+        var b = lurk.getBoundingClientRect();
+        var from = radius, to = Math.hypot(b.width, b.height) * 1.1, s = performance.now();
+        var grow = function (now) {
+          var p = reduce ? 1 : Math.min(1, (now - s) / 1200);
+          lurk.style.setProperty('--r', (from + (to - from) * (1 - Math.pow(1 - p, 3))).toFixed(1) + 'px');
+          if (p < 1) requestAnimationFrame(grow);
+        };
+        requestAnimationFrame(grow);
+        foundCard.hidden = false;
+      };
+
+      lurk.addEventListener('pointermove', function (e) { if (e.pointerType !== 'touch') aim(e.clientX, e.clientY); });
+      lurk.addEventListener('pointerdown', function (e) { aim(e.clientX, e.clientY); });
+      ['touchstart', 'touchmove'].forEach(function (type) {
+        lurk.addEventListener(type, function (e) { var t = e.touches[0]; if (t) aim(t.clientX, t.clientY); }, { passive: true });
+      });
+      $('[data-lurk-skip]', lurk).addEventListener('click', reveal);
+      window.addEventListener('resize', size);
+      size();
+      onView(lurk, function (isIn) { lurkInView = isIn; if (isIn) go(); }, { threshold: 0.15 });
+    }
+  }
+
   // ---------- Swipe row ----------
   var rail = $('[data-rail]');
   if (rail) {

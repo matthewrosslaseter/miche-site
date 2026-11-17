@@ -45,7 +45,8 @@
   }
 
   /*
-    opts: { email, phone (+1XXXXXXXXXX), sms (true when the visitor checked the texting box), source }
+    opts: { email, phone (+1XXXXXXXXXX), sms (true when the visitor checked the texting box), source,
+            pick ('Neon' | 'Pink' | 'Both': which color they said they're copping, saved on their profile) }
     Email always subscribes. The phone number subscribes to texts only when sms is true.
     If Klaviyo turns down the text part (for example, texting isn't set up in the account yet),
     the email sign-up is sent again on its own, with the phone number saved on the profile.
@@ -57,6 +58,7 @@
       subscriptions: { email: { marketing: { consent: 'SUBSCRIBED' } } },
       properties: { 'Signup page': window.location.pathname }
     };
+    if (opts.pick) attrs.properties['Copping'] = opts.pick;
     if (opts.phone && opts.sms) {
       attrs.phone_number = opts.phone;
       attrs.subscriptions.sms = { marketing: { consent: 'SUBSCRIBED' } };
@@ -72,6 +74,7 @@
           'Texting box checked at': new Date().toISOString()
         }
       };
+      if (opts.pick) emailOnly.properties['Copping'] = opts.pick;
       return send(emailOnly, source + ' (email only)');
     });
   }

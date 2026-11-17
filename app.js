@@ -157,14 +157,37 @@
       }
       button.disabled = true;
       msg.textContent = 'Sending…';
-      signup.subscribe({ email: email, source: 'Website: drop alerts form' }).then(function () {
-        msg.textContent = "You're on the list.";
+      var pick = $('input[name="pick"]:checked', form);
+      signup.subscribe({ email: email, source: 'Website: drop alerts form', pick: pick ? pick.value : '' }).then(function () {
+        msg.textContent = pick ? "You're on the list. " + pick.value + (pick.value === 'Both' ? ' it is.' : ' gang.') : "You're on the list.";
         form.reset();
       }).catch(function () {
         msg.textContent = 'Something went wrong. Try again.';
       }).then(function () {
         button.disabled = false;
       });
+    });
+  });
+
+  // ---------- "Send it to the group chat": the phone's share sheet, or copy the link ----------
+  $$('[data-share]').forEach(function (btn) {
+    var label = $('[data-share-label]', btn);
+    var original = label ? label.textContent : '';
+    btn.addEventListener('click', function () {
+      var url = window.location.href.split('#')[0];
+      var data = { title: 'Miche', text: 'Miche Drop 001: the Fitted Set in neon and pink', url: url };
+      var done = function (text) {
+        if (!label) return;
+        label.textContent = text;
+        setTimeout(function () { label.textContent = original; }, 2400);
+      };
+      if (navigator.share) {
+        navigator.share(data).catch(function () { /* closed the share sheet */ });
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () { done('Link copied'); }, function () { done(url); });
+      } else {
+        done(url);
+      }
     });
   });
 

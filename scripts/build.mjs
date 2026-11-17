@@ -264,6 +264,60 @@ async function buildFilm(photos) {
   };
 }
 
+/*
+  Share card: the big preview that shows when the link is sent in texts, IG DMs, X or iMessage.
+  Three shoot photos side by side (neon, pink, neon) at 1200x630, plus the tags that point to it.
+*/
+async function buildShareCard(photos) {
+  const win = {};
+  new Function('window', await readFile(path.join(ROOT, 'config.js'), 'utf8'))(win);
+  const C = win.MICHE_CONFIG || {};
+  const fix = C.colorOverrides || {};
+  const colorOf = (p) => (fix[p.name] !== undefined ? fix[p.name] : p.color);
+  const has = (n, color) => photos.some((p) => p.name === n && (!color || colorOf(p) === color));
+  const firstOf = (color, prefer) => prefer.find((n) => n && has(n, color)) || (photos.find((p) => colorOf(p) === color) || {}).name;
+  const S = C.shoot || {};
+  const picks = [
+    firstOf('neon', [S.hero, S.setNeon]),
+    firstOf('pink', [S.setPink, ...(((C.colorPhotos || {}).pink) || [])]),
+    firstOf('neon', [S.zipup, S.setNeon, S.pants])
+  ];
+  if (picks[2] === picks[0]) picks[2] = photos.find((p) => colorOf(p) === 'neon' && p.name !== picks[0])?.name;
+  if (picks.some((n) => !n)) throw new Error('not enough neon and pink photos');
+  const W = 1200, H = 630, GAP = 6;
+  const layers = [];
+  for (let k = 0; k < 3; k++) {
+    const left = Math.round((k * (W + GAP)) / 3);
+    const width = Math.round(((k + 1) * (W + GAP)) / 3) - GAP - left;
+    const input = await sharp(path.join(CACHE, 'full', picks[k] + '.jpg'))
+      .resize(width, H, { fit: 'cover', position: sharp.gravity.north }).toBuffer();
+    layers.push({ input, left, top: 0 });
+  }
+  await mkdir(path.join(OUT, 'media'), { recursive: true });
+  await sharp({ create: { width: W, height: H, channels: 3, background: '#0B0B0B' } })
+    .composite(layers).jpeg({ quality: 84, mozjpeg: true }).toFile(path.join(OUT, 'media', 'share.jpg'));
+
+  // Absolute link, so it follows the site to shopmiche.com once the domain is connected
+  const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || 'miche-site.vercel.app';
+  const base = 'https://' + host.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+  const tags = [
+    `<meta property="og:image" content="${base}/media/share.jpg">`,
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta property="og:image:alt" content="The Miche Fitted Set in neon and pink">',
+    '<meta property="og:site_name" content="Miche">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:image" content="${base}/media/share.jpg">`
+  ];
+  for (const page of ['index.html', 'product.html']) {
+    const file = path.join(OUT, page);
+    const html = await readFile(file, 'utf8');
+    const url = `<meta property="og:url" content="${base}${page === 'index.html' ? '/' : '/product'}">`;
+    await writeFile(file, html.replace('</head>', [...tags, url].join('\n') + '\n</head>'));
+  }
+  console.log(`Share card made from ${picks.join(', ')} for ${base}`);
+}
+
 await copySite();
 let photos = [];
 let swatches = {};
@@ -279,6 +333,13 @@ if (photos.length) {
     film = await buildFilm(photos);
   } catch (e) {
     console.warn(`Film skipped: ${e.message}`);
+  }
+}
+if (photos.length) {
+  try {
+    await buildShareCard(photos);
+  } catch (e) {
+    console.warn(`Share card skipped: ${e.message}`);
   }
 }
 const photoData = { photos, swatches, film };

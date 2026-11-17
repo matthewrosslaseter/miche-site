@@ -23,6 +23,8 @@
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
 </a>
 
+<div class="progress" aria-hidden="true"><span data-progress></span></div>
+
 <header class="site-header" data-header>
   <nav class="nav" aria-label="Main">
     <div class="nav-left">
@@ -261,6 +263,25 @@
     <p class="story-sign"><span class="sign-script">Rod Gibbs</span> Founder</p>
   </section>
 
+  <!-- LURK MODE: photos hiding in the dark; a spotlight follows the cursor or finger -->
+  <section class="lurk-section" aria-labelledby="lurk-title">
+    <div class="lurk" data-lurk>
+      <div class="lurk-grid" data-lurk-grid aria-hidden="true"></div>
+      <div class="lurk-shade" aria-hidden="true"></div>
+      <div class="lurk-copy">
+        <p class="eyebrow">Lurk mode</p>
+        <h2 class="h2" id="lurk-title">Only the ones looking find it.</h2>
+        <p class="lurk-hint"><span data-lurk-hint>Move your cursor around</span> <span class="lurk-meter" aria-hidden="true"><span data-lurk-meter></span></span></p>
+        <button class="lurk-skip" type="button" data-lurk-skip>Just show me</button>
+      </div>
+      <div class="lurk-found" data-lurk-found hidden>
+        <p class="lurk-found-title">You found it.</p>
+        <p class="lurk-found-sub">Lurkers get a mystery discount.</p>
+        <button class="btn btn-accent" type="button" data-open-offer>Scratch for it</button>
+      </div>
+    </div>
+  </section>
+
   <!-- COMMUNITY: swipeable row of cards -->
   <section class="section rail-section">
     <div class="wrap section-top rv">
@@ -349,6 +370,14 @@
         <p>Early access and restock alerts, straight to your inbox.</p>
       </div>
       <form class="signup-form" data-signup novalidate>
+        <fieldset class="pick">
+          <legend>Which one are you copping?</legend>
+          <div class="pick-row">
+            <label class="pick-opt"><input type="radio" name="pick" value="Neon"><span class="dot" data-swatch="neon"></span>Neon</label>
+            <label class="pick-opt"><input type="radio" name="pick" value="Pink"><span class="dot" data-swatch="pink"></span>Pink</label>
+            <label class="pick-opt"><input type="radio" name="pick" value="Both"><span class="pick-both" aria-hidden="true"><span class="dot" data-swatch="neon"></span><span class="dot" data-swatch="pink"></span></span>Both</label>
+          </div>
+        </fieldset>
         <label for="email">Email</label>
         <div class="signup-row">
           <input id="email" name="email" type="email" autocomplete="email" placeholder="you@email.com" required>
@@ -371,6 +400,7 @@
           <a class="btn btn-accent" href="/product?piece=set&amp;color=neon">Shop neon</a>
           <a class="btn btn-glass" href="/product?piece=set&amp;color=pink">Shop pink</a>
         </div>
+        <button class="share-btn" type="button" data-share><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span data-share-label>Send it to the group chat</span></button>
         <ul class="closer-facts">
           <li>Sizes XS–L</li>
           <li>Free shipping over [$X]</li>
