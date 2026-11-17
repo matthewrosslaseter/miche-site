@@ -168,15 +168,26 @@
   </div>
 </section>
 
-<section class="rule-top">
-  <div class="wrap section">
-    <h2 class="display h-sub" style="margin-bottom: 32px">In the wild</h2>
-    <div class="wild">
-      <div class="ph r-11" data-role="wild1" data-alt="Miche fitted set fit check"><b>Fit check</b><span>Zip-up open, full set, full length</span></div>
-      <div class="ph r-11" data-role="wild2" data-alt="Miche fitted set worn"><b>Try-on</b><span>Friends in the set, no school logos in frame</span></div>
-      <div class="ph r-11" data-role="wild3" data-alt="Miche fitted set"><b>Unboxing</b><span>Mailer, tissue and card</span></div>
+<!-- In the wild: real clips of the set being worn, following the color picked above (clips.js) -->
+<section class="rule-top section clips-section" data-clips-section data-clips-by-color hidden>
+  <div class="wrap section-top">
+    <div>
+      <p class="eyebrow">In the wild</p>
+      <h2 class="display h-sub">See it worn in <span data-clips-color>neon</span>.</h2>
+    </div>
+    <div class="clips-side">
+      <p class="muted clips-note">Tap a clip for sound.</p>
+      <div class="rail-arrows">
+        <button class="round-btn" type="button" data-clips-prev aria-label="Scroll back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="round-btn" type="button" data-clips-next aria-label="Scroll forward">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
     </div>
   </div>
+  <div class="rail clips-rail" data-clips-rail tabindex="0" aria-label="Clips of the set being worn"></div>
 </section>
 
 <footer class="site-footer">
@@ -207,6 +218,7 @@
 <script src="/photos.js"></script>
 <script src="/signup.js"></script>
 <script src="/app.js"></script>
+<script src="/clips.js"></script>
 <script src="/popup.js"></script>
 </body>
 </html>

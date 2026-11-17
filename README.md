@@ -35,13 +35,19 @@ There's no video from the shoot yet, so every build turns the shoot photos into 
 
 The hero plays it in the background, "Watch the film" opens a full-screen player, and there's an inline player in the Film section. It's skipped for visitors who turn on reduced motion or data saver. The film is rebuilt only when the photo picks change. When there is real footage, the build can be pointed at it instead.
 
-## Clips ("Out in it")
+## Clips (real footage)
 
-Real footage of the set being worn, in a swipe row on the home page (nav link "Clips"). Previews play muted while on screen; tapping one opens a full-screen viewer with sound (tap the sides or swipe to skip, hold to pause, swipe down or Esc to close), with a "Shop" button for that clip's color.
+Ten phone clips of the set being worn, used across the site:
 
-- Files live in `media/clips/` (`clip-01.mp4` + `clip-01.jpg` poster, and so on). They're 720×1280 H.264, about 2–3 MB each, with the iPhone HDR clips converted to normal color and the audio levels evened out.
+- **Hero (home page):** a short reel cut from the clips plays behind the headline (`media/reel-tall.mp4` on phones, `media/reel-wide.mp4` with three clips side by side on desktop). "Watch the film" still opens the photo film.
+- **"Out in it." row (home page, nav link "Clips"):** silent previews play while on screen; tapping one opens a full-screen viewer with sound (tap the sides or swipe to skip, hold to pause, swipe down or Esc to close) and a Shop button for that clip's color.
+- **Lurk mode:** three clips hide among the photos.
+- **Product page, "In the wild":** the clips for the color being viewed (pink shows the pink clips first, then the ones with both colors). It follows the color buttons.
+
+Files are in `media/clips/`: `clip-01.mp4` (720×1280 with sound, for the viewer), `clip-01-sm.mp4` (small silent preview) and `clip-01.jpg` (poster). The originals were iPhone videos; the HDR ones were converted to normal color and the audio levels evened out.
+
 - Order, color tag, and which clips show: `config.js` → `clips`. Delete a line to hide a clip.
-- To add a new clip, convert it to the same format and add a line to `clips` (ask Claude to do it from a Drive or Dropbox link).
+- After adding or replacing a clip, run `python3 scripts/clips.py` (needs ffmpeg) to remake the previews and the hero reel. Which moments go in the reel is set at the top of that file.
 
 ## Selling (connect Shopify)
 

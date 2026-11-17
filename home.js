@@ -80,11 +80,14 @@
     if (fs) fs.hidden = false;
   }
 
-  // Background film (hero + closer): muted loop, plays only while on screen, with a pause button
-  function backgroundFilm(video, toggle) {
-    if (!film || !video) return;
+  // Real footage cut into a short loop (made by scripts/clips.py); plays behind the hero
+  var reel = { tall: '/media/reel-tall.mp4', wide: '/media/reel-wide.mp4', posterTall: '/media/reel-tall.jpg', posterWide: '/media/reel-wide.jpg' };
+
+  // Background video (hero + closer): muted loop, plays only while on screen, with a pause button
+  function backgroundFilm(video, toggle, srcs) {
+    if (!srcs || !video) return;
     var card = video.parentNode;
-    video.poster = filmPoster();
+    video.poster = wide() ? srcs.posterWide : srcs.posterTall;
     var userPaused = reduce || saveData;
     var visible = false;
     var started = false;
@@ -96,7 +99,7 @@
     }
     function play() {
       if (userPaused || !visible) return;
-      if (!started) { video.src = filmSrc(); started = true; }
+      if (!started) { video.src = wide() ? srcs.wide : srcs.tall; started = true; }
       var p = video.play();
       if (p && p.catch) p.catch(function () { sync(); });
     }
@@ -115,8 +118,8 @@
     }, { threshold: 0.15 });
     sync();
   }
-  backgroundFilm($('[data-hero-video]'), $('[data-hero-toggle]'));
-  backgroundFilm($('[data-closer-video]'), null);
+  backgroundFilm($('[data-hero-video]'), $('[data-hero-toggle]'), reel);
+  backgroundFilm($('[data-closer-video]'), null, film);
 
   // ---------- Film player (inline section + full-screen modal) ----------
   function fmt(t) {
@@ -409,6 +412,19 @@
       lurk.parentNode.hidden = true;
     } else {
       lurkPics.forEach(function (name) { lgrid.appendChild(img(name, '', { thumb: true })); });
+      // A few real clips hiding among the photos (silent previews; they play only while this section is on screen)
+      var MC = window.MicheClips;
+      var lurkVids = [];
+      if (MC && MC.previews && MC.all.length) {
+        var picks = ['clip-02', 'clip-05', 'clip-07'];
+        [1, 6, 10].forEach(function (slot, k) {
+          var c = MC.all.filter(function (x) { return x.file === picks[k]; })[0] || MC.all[k];
+          if (!c || !lgrid.children[slot]) return;
+          var v = MC.silentVideo(c);
+          lgrid.replaceChild(v, lgrid.children[slot]);
+          lurkVids.push(v);
+        });
+      }
       $('[data-lurk-hint]', lurk).textContent = mm('(hover: none)') ? 'Drag your finger around' : 'Move your cursor around';
 
       var COLS = 8, ROWS = 5, GOAL = Math.round(COLS * ROWS * 0.4);
@@ -488,7 +504,11 @@
       $('[data-lurk-skip]', lurk).addEventListener('click', reveal);
       window.addEventListener('resize', size);
       size();
-      onView(lurk, function (isIn) { lurkInView = isIn; if (isIn) go(); }, { threshold: 0.15 });
+      onView(lurk, function (isIn) {
+        lurkInView = isIn;
+        if (isIn) go();
+        lurkVids.forEach(function (v) { if (isIn) MC.playSilent(v); else v.pause(); });
+      }, { threshold: 0.15 });
     }
   }
 
@@ -553,218 +573,6 @@
       if (moved) rail.addEventListener('click', function stop(ev) { ev.preventDefault(); ev.stopPropagation(); rail.removeEventListener('click', stop, true); }, true);
     });
   }
-
-  // ---------- Clips: real footage. Muted previews play while on screen; tap opens the full-screen viewer ----------
-  (function () {
-    var clips = (D.config.clips || []).filter(function (c) { return c && c.file; });
-    var section = $('[data-clips-section]');
-    var crail = $('[data-clips-rail]');
-    if (!section || !crail || !clips.length) {
-      $$('[data-clips-link]').forEach(function (el) { el.hidden = true; });
-      return;
-    }
-    section.hidden = false;
-    var base = '/media/clips/';
-    var tagText = function (c) { return c.color === 'both' ? 'Neon + Pink' : colorName(c.color); };
-    var shopHref = function (c) { return '/product?piece=set' + (c.color === 'both' ? '' : '&color=' + c.color); };
-    var shopText = function (c) { return c.color === 'both' ? 'Shop the set' : 'Shop ' + colorName(c.color).toLowerCase(); };
-    var previews = !(reduce || saveData);
-
-    // ----- Cards -----
-    clips.forEach(function (c, i) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'rcard ccard';
-      b.setAttribute('aria-label', 'Play clip ' + (i + 1) + ' of ' + clips.length + ', ' + tagText(c));
-      var poster = document.createElement('img');
-      poster.className = 'rcard-img';
-      poster.src = base + c.file + '.jpg';
-      poster.alt = '';
-      poster.loading = 'lazy';
-      poster.decoding = 'async';
-      b.appendChild(poster);
-      var dots = c.color === 'both' ? ['neon', 'pink'] : [c.color];
-      var tag = document.createElement('span');
-      tag.className = 'ccard-tag';
-      tag.innerHTML = dots.map(function (d) { return '<span class="dot" data-swatch="' + d + '"></span>'; }).join('') + '<span></span>';
-      tag.lastChild.textContent = tagText(c);
-      b.appendChild(tag);
-      b.insertAdjacentHTML('beforeend', '<span class="rcard-play ccard-play" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span>');
-      b.addEventListener('click', function () { openStory(i); });
-      crail.appendChild(b);
-
-      if (!previews) return;
-      var v = null;
-      onView(b, function (isIn) {
-        if (isIn) {
-          if (!v) {
-            v = document.createElement('video');
-            v.className = 'rcard-img ccard-video';
-            v.muted = true; v.loop = true; v.playsInline = true;
-            v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
-            v.preload = 'metadata';
-            v.src = base + c.file + '.mp4';
-            v.addEventListener('playing', function () { b.classList.add('is-playing'); });
-            b.insertBefore(v, poster.nextSibling);
-          }
-          if (story.hidden) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
-        } else if (v) {
-          v.pause();
-        }
-      }, { threshold: 0.6 });
-    });
-    // Swatch dots in the cards pick up the measured colors like the rest of the page
-    $$('[data-swatch]', crail).forEach(function (el) { el.style.backgroundColor = D.swatchOf(el.getAttribute('data-swatch')); });
-
-    // Arrows + mouse drag, same feel as the other swipe row
-    var cprev = $('[data-clips-prev]'), cnext = $('[data-clips-next]');
-    var cstep = function () { var c = $('.ccard', crail); return c ? c.getBoundingClientRect().width + 16 : 260; };
-    cprev.addEventListener('click', function () { crail.scrollBy({ left: -cstep() * 2, behavior: reduce ? 'auto' : 'smooth' }); });
-    cnext.addEventListener('click', function () { crail.scrollBy({ left: cstep() * 2, behavior: reduce ? 'auto' : 'smooth' }); });
-    var csync = function () {
-      cprev.disabled = crail.scrollLeft < 8;
-      cnext.disabled = crail.scrollLeft + crail.clientWidth > crail.scrollWidth - 8;
-    };
-    crail.addEventListener('scroll', csync, { passive: true });
-    window.addEventListener('resize', csync);
-    csync();
-    var cdrag = null;
-    crail.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'mouse') cdrag = { x: e.clientX, left: crail.scrollLeft, moved: false };
-    });
-    window.addEventListener('pointermove', function (e) {
-      if (!cdrag) return;
-      var dx = e.clientX - cdrag.x;
-      if (Math.abs(dx) > 6) { cdrag.moved = true; crail.classList.add('is-dragging'); }
-      crail.scrollLeft = cdrag.left - dx;
-    });
-    window.addEventListener('pointerup', function () {
-      if (!cdrag) return;
-      var moved = cdrag.moved;
-      cdrag = null;
-      crail.classList.remove('is-dragging');
-      if (moved) crail.addEventListener('click', function stop(ev) { ev.preventDefault(); ev.stopPropagation(); crail.removeEventListener('click', stop, true); }, true);
-    });
-
-    // ----- Full-screen viewer -----
-    var story = $('[data-story]');
-    var sv = $('[data-story-video]', story);
-    var bars = $('[data-story-bars]', story);
-    var stag = $('[data-story-tag]', story);
-    var shop = $('[data-story-shop]', story);
-    var sound = $('[data-story-sound]', story);
-    var tap = $('[data-story-tap]', story);
-    var cur = 0, muted = false, lastFocus = null, raf = 0;
-    bars.innerHTML = clips.map(function () { return '<span><i></i></span>'; }).join('');
-    var fills = $$('i', bars);
-
-    function paintBars() {
-      var p = sv.duration ? Math.min(1, sv.currentTime / sv.duration) : 0;
-      fills.forEach(function (f, k) { f.style.transform = 'scaleX(' + (k < cur ? 1 : k === cur ? p : 0) + ')'; });
-      if (!story.hidden) raf = requestAnimationFrame(paintBars);
-    }
-    function setSound(m) {
-      muted = m;
-      sv.muted = m;
-      story.classList.toggle('is-muted', m);
-      sound.setAttribute('aria-label', m ? 'Turn sound on' : 'Mute');
-    }
-    function show(i) {
-      cur = (i + clips.length) % clips.length;
-      var c = clips[cur];
-      sv.poster = base + c.file + '.jpg';
-      sv.src = base + c.file + '.mp4';
-      sv.muted = muted;
-      stag.textContent = tagText(c) + ' · ' + (cur + 1) + '/' + clips.length;
-      shop.href = shopHref(c);
-      shop.textContent = shopText(c);
-      var p = sv.play();
-      // Browsers can refuse sound without a fresh tap; fall back to muted rather than not playing
-      if (p && p.catch) p.catch(function () { if (!sv.muted) { setSound(true); sv.play().catch(function () {}); } });
-      // Warm up the next clip so skipping feels instant
-      var nx = clips[(cur + 1) % clips.length];
-      var pre = new Image(); pre.src = base + nx.file + '.jpg';
-    }
-    function openStory(i) {
-      lastFocus = document.activeElement;
-      $$('.ccard-video', crail).forEach(function (v) { v.pause(); });
-      story.hidden = false;
-      document.documentElement.classList.add('modal-open');
-      setSound(false);
-      show(i);
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(paintBars);
-      $('[data-story-close]', story).focus();
-    }
-    function closeStory() {
-      if (story.hidden) return;
-      sv.pause();
-      sv.removeAttribute('src');
-      sv.load();
-      story.hidden = true;
-      story.classList.remove('is-held');
-      cancelAnimationFrame(raf);
-      document.documentElement.classList.remove('modal-open');
-      // Resume the previews that are on screen
-      $$('.ccard-video', crail).forEach(function (v) {
-        var r = v.getBoundingClientRect();
-        if (r.right > 0 && r.left < window.innerWidth && r.bottom > 0 && r.top < window.innerHeight) v.play().catch(function () {});
-      });
-      if (lastFocus && lastFocus.focus) lastFocus.focus();
-    }
-    sv.addEventListener('ended', function () {
-      if (cur === clips.length - 1) closeStory(); else show(cur + 1);
-    });
-    $('[data-story-close]', story).addEventListener('click', closeStory);
-    $('[data-story-prev]', story).addEventListener('click', function () { show(cur - 1); });
-    $('[data-story-next]', story).addEventListener('click', function () { show(cur + 1); });
-    sound.addEventListener('click', function () { setSound(!muted); if (sv.paused) sv.play().catch(function () {}); });
-    story.addEventListener('click', function (e) { if (e.target === story) closeStory(); });
-
-    // Tap left third = back, elsewhere = next. Press and hold = pause. Swipe down = close.
-    var press = null;
-    tap.addEventListener('pointerdown', function (e) {
-      press = { x: e.clientX, y: e.clientY, t: Date.now(), held: false };
-      press.timer = setTimeout(function () {
-        if (!press) return;
-        press.held = true;
-        sv.pause();
-        story.classList.add('is-held');
-      }, 220);
-    });
-    var release = function (e, cancelled) {
-      if (!press) return;
-      clearTimeout(press.timer);
-      var p = press; press = null;
-      story.classList.remove('is-held');
-      var dy = e.clientY - p.y, dx = e.clientX - p.x;
-      if (!cancelled && dy > 80 && Math.abs(dy) > Math.abs(dx)) { closeStory(); return; }
-      if (p.held || cancelled) { sv.play().catch(function () {}); return; }
-      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) { show(cur + (dx < 0 ? 1 : -1)); return; }
-      var r = tap.getBoundingClientRect();
-      show(cur + (e.clientX - r.left < r.width / 3 ? -1 : 1));
-    };
-    tap.addEventListener('pointerup', function (e) { release(e, false); });
-    tap.addEventListener('pointercancel', function (e) { release(e, true); });
-    tap.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-
-    document.addEventListener('keydown', function (e) {
-      if (story.hidden) return;
-      if (e.key === 'Escape') closeStory();
-      else if (e.key === 'ArrowRight') show(cur + 1);
-      else if (e.key === 'ArrowLeft') show(cur - 1);
-      else if (e.key === 'm' || e.key === 'M') setSound(!muted);
-      else if (e.key === ' ' && e.target === document.body) { e.preventDefault(); if (sv.paused) sv.play().catch(function () {}); else sv.pause(); }
-      else if (e.key === 'Tab') {
-        // Keep focus inside the viewer
-        var f = $$('button:not([hidden]), a[href]', story).filter(function (el) { return el.offsetParent !== null; });
-        if (!f.length) return;
-        var first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    });
-  })();
 
   // ---------- Reveal sections as they scroll in ----------
   if (!reduce && 'IntersectionObserver' in window) {

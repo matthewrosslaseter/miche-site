@@ -424,7 +424,8 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 .lurk {
   --x: 50%; --y: 45%; --r: 160px;
   position: relative; overflow: hidden; max-width: 1600px; margin: 0 auto;
-  height: clamp(560px, 84svh, 820px); border-radius: var(--radius); background: #050505;
+  /* Height follows the grid so every tile is a 2:3 portrait, the same shape as the photos (6 x 2 tiles here) */
+  aspect-ratio: 2 / 1; min-height: 520px; border-radius: var(--radius); background: #050505;
   touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 .lurk-grid {
@@ -471,8 +472,19 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 .lurk-found-title { margin: 0; font-size: 32px; font-weight: 500; letter-spacing: -0.04em; line-height: 1.05; }
 .lurk-found-sub { margin: 0 0 12px; color: var(--soft); }
 @keyframes lurkFound { from { opacity: 0; transform: translate(-50%, 18px); } to { opacity: 1; transform: translate(-50%, 0); } }
-@media (max-width: 899px) { .lurk-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); } }
-@media (max-width: 599px) { .lurk-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 4px; } }
+.lurk-grid video { width: 100%; height: 100%; min-height: 0; object-fit: cover; pointer-events: none; background: #050505; }
+/* Tablets: 4 x 3 tiles */
+@media (max-width: 899px) {
+  .lurk { aspect-ratio: 8 / 9; min-height: 0; }
+  .lurk-grid { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); }
+}
+/* Phones: 3 x 4 tiles, the box gets taller instead of squashing the photos */
+@media (max-width: 599px) {
+  .lurk { aspect-ratio: 1 / 2; max-height: none; }
+  .lurk-grid { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(4, 1fr); gap: 4px; }
+  .lurk-copy { padding: 22px 20px; }
+  .lurk-copy .h2 { font-size: clamp(30px, 8.6vw, 38px); }
+}
 @media (prefers-reduced-motion: reduce) { .lurk-found { animation: none; } }
 
 /* ---------- Home: swipe row ---------- */
@@ -628,6 +640,12 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 }
 .closer-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.9s ease; }
 .closer-card .hero-shade { background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.72) 100%); }
+/* Phones: a tall portrait card (like the photos and film), with the words at the bottom so they don't sit on faces */
+@media (max-width: 599px) {
+  .closer-card { min-height: min(88svh, 168vw); align-items: flex-end; }
+  .closer-card .hero-shade { background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.55) 62%, rgba(0, 0, 0, 0.85) 100%); }
+  .closer-content { gap: 20px; padding-bottom: 28px; }
+}
 .closer-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 26px; padding: 32px 20px; }
 .closer-title { margin: 0; font-size: clamp(60px, 12vw, 180px); font-weight: 500; letter-spacing: -0.06em; line-height: 0.88; }
 .closer-facts { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
@@ -854,6 +872,26 @@ tbody td { color: var(--muted); }
 .pop-step.is-inline { margin-top: 4px; }
 .pop-step.is-inline > .eyebrow, .pop-step.is-inline > .pop-title { display: none; }
 .pop { overscroll-behavior: contain; }
+/* Phones: a scratch card shaped like a real card, sized to the screen instead of a fixed height */
+.scratch { height: auto; aspect-ratio: 1.6 / 1; max-height: 34svh; min-height: 150px; }
+@media (max-width: 480px) {
+  .pop { padding: 30px 20px 20px; }
+  .pop-title { font-size: clamp(40px, 12vw, 52px); }
+  .pop-step { gap: 12px; }
+}
+/* Phone turned sideways (short screens): tighter type, and the card sits beside the copy so nothing scrolls off */
+@media (max-height: 520px) and (orientation: landscape) {
+  .pop { max-width: 720px; padding: 18px 22px 16px; max-height: calc(100dvh - 20px); }
+  .pop-backdrop { padding-top: calc(10px + env(safe-area-inset-top, 0px)); padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  .pop-preview { margin: 0 48px 10px; padding: 4px 8px; font-size: 11px; }
+  .pop-step { gap: 8px; }
+  .pop-title { font-size: 30px; }
+  .pop-step > .eyebrow { display: none; }
+  .pop-sub { font-size: 14px; }
+  .scratch { max-height: none; min-height: 0; height: min(40dvh, 170px); aspect-ratio: auto; }
+  .pop-skip { min-height: 36px; }
+  .wheel-wrap { width: min(220px, 52dvh); }
+}
 @media (prefers-reduced-motion: reduce) {
   .scratch-hint span { animation: none; left: calc(50% - 11px); }
   .scratch.is-revealed .scratch-prize-label { animation: none; }
