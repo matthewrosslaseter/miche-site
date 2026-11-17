@@ -35,6 +35,14 @@ There's no video from the shoot yet, so every build turns the shoot photos into 
 
 The hero plays it in the background, "Watch the film" opens a full-screen player, and there's an inline player in the Film section. It's skipped for visitors who turn on reduced motion or data saver. The film is rebuilt only when the photo picks change. When there is real footage, the build can be pointed at it instead.
 
+## Clips ("Out in it")
+
+Real footage of the set being worn, in a swipe row on the home page (nav link "Clips"). Previews play muted while on screen; tapping one opens a full-screen viewer with sound (tap the sides or swipe to skip, hold to pause, swipe down or Esc to close), with a "Shop" button for that clip's color.
+
+- Files live in `media/clips/` (`clip-01.mp4` + `clip-01.jpg` poster, and so on). They're 720×1280 H.264, about 2–3 MB each, with the iPhone HDR clips converted to normal color and the audio levels evened out.
+- Order, color tag, and which clips show: `config.js` → `clips`. Delete a line to hide a clip.
+- To add a new clip, convert it to the same format and add a line to `clips` (ask Claude to do it from a Drive or Dropbox link).
+
 ## Selling (connect Shopify)
 
 This site doesn't take payments itself. "Buy now" sends the customer to Shopify checkout once `config.js` has:

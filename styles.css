@@ -512,6 +512,74 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 .rcard-offer-big { font-size: clamp(40px, 4vw, 52px); font-weight: 500; letter-spacing: -0.05em; line-height: 0.92; }
 .rcard-offer .rcard-label span { color: rgba(11, 11, 11, 0.7); }
 
+/* ---------- Home: clips (real footage) ---------- */
+.clips-section { padding-bottom: clamp(56px, 8vw, 104px); }
+.clips-side { display: flex; align-items: center; gap: 16px; }
+.clips-note { margin: 0; font-size: 14px; }
+.ccard { flex-basis: clamp(200px, 21vw, 280px); aspect-ratio: 9 / 16; padding: 14px; justify-content: flex-start; }
+.ccard::after { background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 70%, rgba(0, 0, 0, 0.35) 100%); z-index: 1; }
+.ccard-video { opacity: 0; transition: opacity 0.5s ease; }
+.ccard.is-playing .ccard-video { opacity: 1; }
+.ccard:hover .ccard-video { transform: scale(1.04); }
+.ccard-tag {
+  position: relative; z-index: 2; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px 6px 7px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: rgba(0, 0, 0, 0.42); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.ccard-tag .dot { width: 12px; height: 12px; }
+.ccard-tag .dot + .dot { margin-left: -9px; box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.6); }
+.ccard-play { top: auto; bottom: 14px; left: auto; right: 14px; transform: none; width: 44px; height: 44px; }
+.ccard-play svg { width: 16px; height: 16px; }
+.ccard:hover .ccard-play { transform: scale(1.08); }
+@media (max-width: 640px) {
+  .clips-note { display: none; }
+  .ccard { flex-basis: 58vw; }
+}
+
+/* Full-screen clip viewer */
+.clipview {
+  position: fixed; inset: 0; z-index: 130; display: flex; align-items: center; justify-content: center; gap: 24px;
+  background: rgba(0, 0, 0, 0.96);
+}
+.clipview[hidden] { display: none; }
+.clipview-stage {
+  position: relative; overflow: hidden; background: #000;
+  height: min(100svh - 48px, 900px); aspect-ratio: 9 / 16; max-width: 100vw; border-radius: 20px;
+}
+.clipview-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+.clipview-top {
+  position: absolute; z-index: 3; left: 0; right: 0; top: 0;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 28px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+}
+.clipview-bars { display: flex; gap: 4px; }
+.clipview-bars span { flex: 1; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, 0.3); overflow: hidden; }
+.clipview-bars i { display: block; height: 100%; background: #fff; transform: scaleX(0); transform-origin: left; }
+.clipview-head { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.clipview-tag { flex: 1; font-size: 13px; font-weight: 600; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5); }
+.clipview-btn {
+  width: 40px; height: 40px; border-radius: 50%; border: 0; display: grid; place-items: center; cursor: pointer;
+  color: #fff; background: rgba(255, 255, 255, 0.16); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+}
+.clipview-btn:hover { background: rgba(255, 255, 255, 0.28); }
+.clipview-btn .i-off, .clipview.is-muted .clipview-btn .i-on { display: none; }
+.clipview.is-muted .clipview-btn .i-off { display: block; }
+.clipview-tap { position: absolute; inset: 0; z-index: 2; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.clipview-foot {
+  position: absolute; z-index: 3; left: 0; right: 0; bottom: 0; display: flex; justify-content: center;
+  padding: 40px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+  transition: opacity 0.2s ease;
+}
+.clipview.is-held .clipview-top, .clipview.is-held .clipview-foot { opacity: 0; }
+.clipview-top { transition: opacity 0.2s ease; }
+.clipview-nav { flex: none; color: #fff; }
+@media (max-width: 640px), (max-aspect-ratio: 3 / 4) {
+  .clipview { background: #000; }
+  .clipview-stage { height: 100%; width: 100%; aspect-ratio: auto; border-radius: 0; }
+  .clipview-nav { display: none; }
+}
+
 /* ---------- Home: FAQ ---------- */
 .faq { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr); gap: 32px clamp(32px, 6vw, 96px); align-items: start; }
 .faq-head .muted { margin: 16px 0 0; }

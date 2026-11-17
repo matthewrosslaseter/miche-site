@@ -30,6 +30,8 @@ async function copySite() {
   await mkdir(OUT, { recursive: true });
   for (const f of SITE_FILES) await cp(path.join(ROOT, f), path.join(OUT, f));
   if (existsSync(path.join(ROOT, 'images'))) await cp(path.join(ROOT, 'images'), path.join(OUT, 'images'), { recursive: true });
+  // Real footage for the home page clips (already web-sized MP4s + JPG posters)
+  if (existsSync(path.join(ROOT, 'media', 'clips'))) await cp(path.join(ROOT, 'media', 'clips'), path.join(OUT, 'media', 'clips'), { recursive: true });
 }
 
 function zipUrl(url) {

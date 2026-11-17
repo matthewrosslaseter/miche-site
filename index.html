@@ -30,6 +30,7 @@
     <div class="nav-left">
       <a href="#shop">Shop</a>
       <a href="#colors">Colors</a>
+      <a href="#clips" data-clips-link>Clips</a>
       <a href="#film" data-film-link>Film</a>
       <a href="#story">Story</a>
     </div>
@@ -52,6 +53,7 @@
   <nav class="menu-links" aria-label="Menu">
     <a href="#shop">Shop</a>
     <a href="#colors">Colors</a>
+    <a href="#clips" data-clips-link>Clips</a>
     <a href="#film" data-film-link>The film</a>
     <a href="#details">Details</a>
     <a href="#story">Story</a>
@@ -173,6 +175,28 @@
         </div>
       </article>
     </div>
+  </section>
+
+  <!-- CLIPS: real footage of the set, worn out. Previews play muted; tap one for full screen with sound -->
+  <section id="clips" class="section clips-section" data-clips-section hidden>
+    <div class="wrap section-top rv">
+      <div>
+        <p class="eyebrow">Worn out</p>
+        <h2 class="h2">Out in it.</h2>
+      </div>
+      <div class="clips-side">
+        <p class="muted clips-note">Tap a clip for sound.</p>
+        <div class="rail-arrows">
+          <button class="round-btn" type="button" data-clips-prev aria-label="Scroll back">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
+          <button class="round-btn" type="button" data-clips-next aria-label="Scroll forward">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="rail clips-rail" data-clips-rail tabindex="0" aria-label="Clips of the set being worn"></div>
   </section>
 
   <!-- FILM: custom video player -->
@@ -464,6 +488,36 @@
       </button>
     </div>
   </div>
+</div>
+
+<!-- Full-screen clip viewer: tap the sides to skip, hold to pause -->
+<div class="clipview" hidden data-story role="dialog" aria-modal="true" aria-label="Clips">
+  <button class="clipview-nav clipview-prev round-btn" type="button" data-story-prev aria-label="Previous clip">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+  </button>
+  <div class="clipview-stage" data-story-stage>
+    <video class="clipview-video" playsinline preload="auto" data-story-video></video>
+    <div class="clipview-top">
+      <div class="clipview-bars" data-story-bars></div>
+      <div class="clipview-head">
+        <span class="clipview-tag" data-story-tag></span>
+        <button class="clipview-btn" type="button" data-story-sound aria-label="Mute">
+          <svg class="i-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          <svg class="i-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z" fill="currentColor"/><path d="M16 9l6 6"/><path d="M22 9l-6 6"/></svg>
+        </button>
+        <button class="clipview-btn" type="button" data-story-close aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="clipview-tap" data-story-tap aria-hidden="true"></div>
+    <div class="clipview-foot">
+      <a class="btn btn-accent" href="/product?piece=set" data-story-shop>Shop the set</a>
+    </div>
+  </div>
+  <button class="clipview-nav clipview-next round-btn" type="button" data-story-next aria-label="Next clip">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
 </div>
 
 <script src="/config.js"></script>
