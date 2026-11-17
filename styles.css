@@ -249,9 +249,10 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 }
 .stage-slide {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  opacity: 0; transform: scale(1.05); transition: opacity 0.7s ease, transform 6s ease-out;
+  opacity: 0; transform: scale(1.06); transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 7s cubic-bezier(0.2, 0.6, 0.3, 1);
 }
-.stage-slide.is-on { opacity: 1; transform: scale(1); }
+.stage-slide.is-on { z-index: 2; opacity: 1; transform: scale(1); }
+.stage-slide.is-prev { z-index: 1; opacity: 1; transform: scale(1); }
 .stage-side {
   display: flex; flex-direction: column; justify-content: space-between; gap: 40px;
   padding: clamp(24px, 3vw, 40px); border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line);
@@ -290,8 +291,9 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
 .pcards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .pcard { display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; background: var(--surface); border: 1px solid var(--line); }
 .pcard-media { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; background: #151515; }
-.pcard-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.45s ease, transform 0.8s ease; }
-.pcard-img.is-on { opacity: 1; }
+.pcard-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s ease; }
+.pcard-img.is-on { z-index: 1; opacity: 1; }
+.pcard-img.is-prev { opacity: 1; }
 .pcard:hover .pcard-img.is-on { transform: scale(1.03); }
 .pcard-num {
   position: absolute; z-index: 2; top: 14px; left: 14px; padding: 4px 10px; border-radius: 999px;
@@ -370,8 +372,9 @@ img.photo { display: block; width: 100%; max-width: 100%; height: auto; object-f
   position: sticky; top: 92px; height: min(calc(100svh - 116px), 780px);
   overflow: hidden; border-radius: var(--radius); background: #111;
 }
-.scrolly-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.04); transition: opacity 0.6s ease, transform 1.2s ease; }
-.scrolly-img.is-on { opacity: 1; transform: none; }
+.scrolly-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.04); transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1), transform 1.6s cubic-bezier(0.2, 0.6, 0.3, 1); }
+.scrolly-img.is-on { z-index: 2; opacity: 1; transform: none; }
+.scrolly-img.is-prev { z-index: 1; opacity: 1; transform: none; }
 .scrolly-steps { display: flex; flex-direction: column; }
 .scrolly-step {
   min-height: 64svh; display: flex; flex-direction: column; justify-content: center; gap: 12px;

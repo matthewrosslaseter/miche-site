@@ -27,6 +27,16 @@
     return el;
   }
 
+  // Swap photos without a dark dip: the outgoing photo stays fully visible underneath while the new one fades in on top
+  function crossfade(els, isOn) {
+    els.forEach(function (el, k) {
+      var on = isOn(el, k);
+      if (on) { el.classList.remove('is-prev'); el.classList.add('is-on'); }
+      else if (el.classList.contains('is-on')) { el.classList.remove('is-on'); el.classList.add('is-prev'); }
+      else el.classList.remove('is-prev');
+    });
+  }
+
   function onView(el, fn, options) {
     if (!el) return;
     if (!('IntersectionObserver' in window)) { fn(true); return; }
@@ -195,9 +205,20 @@
     var STEP_LABELS = ['Rhinestone Miche script', 'Cropped, full zip', 'High waist, flared leg', 'Heavyweight, 250–300 GSM'];
     var paused = false;
 
+    var token = 0;
     function show(i) {
       current.idx = i;
-      $$('.stage-slide', media).forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
+      var list = $$('.stage-slide:not(.is-leaving)', media);
+      var mine = ++token;
+      var go = function () {
+        if (mine !== token) return;
+        crossfade(list, function (s, k) { return k === i; });
+        // The last color's photo sits underneath until the new one has faded in, then it goes
+        setTimeout(function () { if (mine === token) $$('.is-leaving', media).forEach(function (el) { el.remove(); }); }, 1100);
+      };
+      // Wait for the incoming photo to load so it fades in rather than popping in
+      var target = list[i];
+      if (target && target.decode && !target.complete) target.decode().then(go, go); else go();
       $$('.step', steps).forEach(function (s, k) {
         s.classList.toggle('is-on', k === i);
         s.classList.toggle('is-done', k < i);
@@ -219,10 +240,13 @@
 
       var pics = D.galleryFor(id).slice(0, 4);
       current.count = pics.length;
-      media.innerHTML = '';
+      // Keep the photo that's showing now, so the new color dissolves in over it
+      var leaving = $('.stage-slide.is-on', media) || $('.stage-slide.is-prev', media);
+      $$('.stage-slide', media).forEach(function (el) { if (el !== leaving) el.remove(); });
+      if (leaving) { leaving.classList.remove('is-on'); leaving.classList.add('is-prev', 'is-leaving'); }
       steps.innerHTML = '';
       if (!pics.length) {
-        media.innerHTML = '<div class="ph stage-slide is-on"><b>' + name + ' photos</b></div>';
+        media.insertAdjacentHTML('beforeend', '<div class="ph stage-slide is-on"><b>' + name + ' photos</b></div>');
         return;
       }
       pics.forEach(function (n, i) {
@@ -239,6 +263,7 @@
         steps.appendChild(li);
         $('.step-bar span', li).addEventListener('animationend', function () { if (!reduce) next(); });
       });
+      void media.offsetWidth; // new photos start see-through, so the switch below animates
       show(0);
     }
 
@@ -281,7 +306,7 @@
     });
     if (!Object.keys(layers).length) mediaEl.insertAdjacentHTML('beforeend', '<div class="ph pcard-img is-on"><b>Photo</b></div>');
     function setColor(id) {
-      Object.keys(layers).forEach(function (k) { layers[k].classList.toggle('is-on', k === id); });
+      crossfade(Object.keys(layers).map(function (k) { return layers[k]; }), function (el) { return el === layers[id]; });
       $$('[data-pcard-color]', card).forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-pcard-color') === id ? 'true' : 'false'); });
       link.href = '/product?piece=' + piece + '&color=' + id;
     }
@@ -309,7 +334,7 @@
       $('[data-scrolly-inline]', stepEl).appendChild(img(n, title, { className: 'scrolly-inline-img' }));
     });
     function activate(i) {
-      $$('.scrolly-img', stickyMedia).forEach(function (el, k) { el.classList.toggle('is-on', k === i); });
+      crossfade($$('.scrolly-img', stickyMedia), function (el, k) { return k === i; });
       stepsEls.forEach(function (el, k) { el.classList.toggle('is-on', k === i); });
     }
     activate(0);

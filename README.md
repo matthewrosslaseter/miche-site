@@ -28,7 +28,7 @@ Put image files in `/images`.
 
 ## The film (hero video)
 
-There's no video from the shoot yet, so every build turns the shoot photos into two short silent loops with a slow push-in on each photo, alternating neon and pink:
+There's no video from the shoot yet, so every build turns the shoot photos into two short silent loops. Each photo gets one slow, steady push-in and dissolves into the next (no hard cuts), alternating neon and pink, and the loop flows back into the start with no visible restart:
 
 - `media/film-tall.mp4` (720×1280) plays on phones. It's also sized to post on TikTok or Reels.
 - `media/film-wide.mp4` (1280×720, three photos side by side) plays on desktop.

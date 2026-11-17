@@ -207,7 +207,8 @@ async function tagColors(photos) {
   The film: picks up to 8 neon and 8 pink photos (the ones chosen in config.js first, then others
   spread across the shoot), alternates them, and renders two MP4 loops. Cached between builds.
 */
-const FILM_VERSION = '1';
+const FILM_VERSION = '2'; // bump to remake the film when film.mjs changes
+const FILM_PER_COLOR = 6;
 async function buildFilm(photos) {
   const win = {};
   new Function('window', await readFile(path.join(ROOT, 'config.js'), 'utf8'))(win);
@@ -220,12 +221,12 @@ async function buildFilm(photos) {
     const want = [C.shoot && color === 'neon' ? C.shoot.hero : '', ...(((C.colorPhotos || {})[color]) || [])];
     for (const n of want) if (n && all.includes(n) && !first.includes(n)) first.push(n);
     const rest = all.filter((n) => !first.includes(n));
-    const need = Math.max(0, 8 - first.length);
+    const need = Math.max(0, FILM_PER_COLOR - first.length);
     for (let i = 0; i < need && rest.length; i++) {
       const n = rest[Math.round(i * (rest.length - 1) / Math.max(1, need - 1))];
       if (!first.includes(n)) first.push(n);
     }
-    return first.slice(0, 8);
+    return first.slice(0, FILM_PER_COLOR);
   };
   const neon = pick('neon'), pink = pick('pink');
   const shots = [];
