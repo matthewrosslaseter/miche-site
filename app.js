@@ -71,6 +71,15 @@
     return picks.concat(spread).slice(0, limit);
   }
 
+  // Hide links to the film if the build couldn't make it
+  if (!PH.film) document.querySelectorAll('[data-film-link]').forEach(function (a) { a.hidden = true; });
+
+  // Shared with home.js
+  window.MicheData = {
+    config: C, film: PH.film || null, colors: COLORS, colorById: colorById, shoot: shoot,
+    photoByName: photoByName, swatchOf: swatchOf, shootSrc: shootSrc, galleryFor: galleryFor
+  };
+
   // Swatch dots anywhere on the site
   $$('[data-swatch]').forEach(function (el) { el.style.backgroundColor = swatchOf(el.getAttribute('data-swatch')); });
 

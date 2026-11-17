@@ -586,6 +586,7 @@
     }
 
     return {
+      open: open,
       destroy: function () {
         timers.forEach(clearTimeout);
         cleanups.forEach(function (fn) { fn(); });
@@ -601,8 +602,21 @@
   }
 
   window.MichePopup = {
-    preview: function (style) { start(style === 'scratch' ? 'scratch' : 'wheel', true); }
+    preview: function (style) { start(style === 'scratch' ? 'scratch' : 'wheel', true); },
+    // Open the live popup on demand (from a "Get 10% off" button)
+    open: function () {
+      if (!current) start(P.style === 'scratch' ? 'scratch' : 'wheel', false);
+      if (current && current.open) current.open();
+    }
   };
+
+  // Any "Get 10% off" button on any page opens the scratch card
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest('[data-open-offer]') : null;
+    if (!t) return;
+    e.preventDefault();
+    window.MichePopup.open();
+  });
 
   window.addEventListener('hashchange', function () {
     var pv = previewFromUrl();

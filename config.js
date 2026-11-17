@@ -56,6 +56,9 @@ window.MICHE_CONFIG = {
   },
   galleryLimit: 12,
 
+  // Home page "The details" section: one photo per step (script, fabric, fit, sizing).
+  detailPhotos: ['IMG_3168', 'IMG_3166', 'IMG_3212', 'IMG_3176'],
+
   // EMAIL + TEXT SIGN-UPS (Klaviyo)
   // In Klaviyo: Settings → Account → API keys → Public API key (6 characters, safe to put here).
   // Lists & segments → open the sign-up list → the list ID is in the page address.

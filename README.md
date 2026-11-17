@@ -26,6 +26,15 @@ Put image files in `/images`.
 - **Home page and other spots:** each striped placeholder is a `<div class="ph …">`. Replace it with an image, keeping the ratio class, for example:
   `<img class="photo r-45" src="/images/hero.jpg" alt="Fitted set on body">`
 
+## The film (hero video)
+
+There's no video from the shoot yet, so every build turns the shoot photos into two short silent loops with a slow push-in on each photo, alternating neon and pink:
+
+- `media/film-tall.mp4` (720×1280) plays on phones. It's also sized to post on TikTok or Reels.
+- `media/film-wide.mp4` (1280×720, three photos side by side) plays on desktop.
+
+The hero plays it in the background, "Watch the film" opens a full-screen player, and there's an inline player in the Film section. It's skipped for visitors who turn on reduced motion or data saver. The film is rebuilt only when the photo picks change. When there is real footage, the build can be pointed at it instead.
+
 ## Selling (connect Shopify)
 
 This site doesn't take payments itself. "Buy now" sends the customer to Shopify checkout once `config.js` has:

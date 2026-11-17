@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Miche — The Fitted Set</title>
 <meta name="description" content="Miche Drop 001: the Fitted Set in neon and pink. Cropped zip-up and high-waisted flare pants with the rhinestone Miche script.">
 <meta property="og:title" content="Miche — The Fitted Set">
@@ -12,108 +12,341 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Great+Vibes&family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Great+Vibes&display=swap">
 <link rel="stylesheet" href="/styles.css">
 </head>
-<body>
+<body class="home">
 <a class="skip" href="#main">Skip to content</a>
 
-<p class="announce">Drop 001 lands [DROP DATE] · Free shipping over [$X]</p>
+<a class="announce" href="/product?piece=set">
+  <span>Drop 001 is here: the Fitted Set in neon and pink</span>
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+</a>
 
-<header class="site-header">
-  <nav class="wrap nav" aria-label="Main">
-    <a class="wordmark" href="/">Miche</a>
-    <div class="nav-links">
+<header class="site-header" data-header>
+  <nav class="nav" aria-label="Main">
+    <div class="nav-left">
       <a href="#shop">Shop</a>
-      <a href="/product?piece=set">The Fitted Set</a>
-      <a href="#about">About</a>
-      <a class="bag-link" href="#" data-cart-link aria-label="Bag">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
-        <span>Bag</span>
+      <a href="#colors">Colors</a>
+      <a href="#film" data-film-link>Film</a>
+      <a href="#story">Story</a>
+    </div>
+    <a class="wordmark" href="/" aria-label="Miche home">Miche</a>
+    <div class="nav-right">
+      <button class="nav-offer" type="button" data-open-offer>Get 10% off</button>
+      <a class="btn btn-accent btn-sm" href="/product?piece=set">Shop</a>
+      <a class="nav-icon" href="#" data-cart-link aria-label="Bag">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 12.2a1 1 0 0 1-1 .8H7.2a1 1 0 0 1-1-.8L5 8z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
       </a>
+      <button class="nav-icon nav-menu-btn" type="button" aria-expanded="false" aria-controls="menu" data-menu-btn>
+        <span class="sr-only">Menu</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h16"/><path d="M4 16h16"/></svg>
+      </button>
     </div>
   </nav>
 </header>
 
+<div class="menu" id="menu" hidden data-menu>
+  <nav class="menu-links" aria-label="Menu">
+    <a href="#shop">Shop</a>
+    <a href="#colors">Colors</a>
+    <a href="#film" data-film-link>The film</a>
+    <a href="#details">Details</a>
+    <a href="#story">Story</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <div class="menu-foot">
+    <button class="btn btn-accent" type="button" data-open-offer>Get 10% off</button>
+    <a href="https://www.instagram.com/miche.inc" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.tiktok.com/@miche.inc" target="_blank" rel="noopener">TikTok</a>
+  </div>
+</div>
+
 <main id="main">
 
-  <section class="wrap hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Drop 001 · Neon &amp; Pink</p>
-      <h1 class="display h-hero">The Fitted<br>Set</h1>
-      <p class="lede">A women's fitted set: cropped zip-up and high-waisted flare pants, finished with the rhinestone Miche script. In neon and pink.</p>
-      <div class="btn-row" style="margin-top: 8px">
-        <a class="btn btn-accent" href="/product?piece=set">Shop the set
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
-        </a>
-        <a class="btn btn-outline" href="#signup">Get drop alerts</a>
+  <!-- HERO: the film playing behind the headline -->
+  <section class="hero" aria-label="The Fitted Set">
+    <div class="hero-card" data-hero>
+      <div class="hero-fallback"><div class="ph" data-role="hero" data-alt="Miche fitted set worn on body"><b>Hero photo</b></div></div>
+      <video class="hero-video" muted loop playsinline preload="none" aria-hidden="true" data-hero-video></video>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="eyebrow">Drop 001 · Neon &amp; Pink</p>
+        <h1 class="hero-title">The Fitted Set</h1>
+        <p class="hero-sub">Cropped zip-up and high-waisted flare pants, finished with the rhinestone Miche script.</p>
+        <div class="btn-row">
+          <a class="btn btn-accent" href="/product?piece=set"><span>Shop the set · <span data-price="set">$125</span></span></a>
+          <button class="btn btn-glass" type="button" data-play-film hidden>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+            Watch the film
+          </button>
+        </div>
       </div>
-      <p class="small muted" style="margin: 0"><span data-price="set">$125</span> · Sizes XS–L</p>
-    </div>
-    <div class="hero-media">
-      <div class="ph r-45" data-role="hero" data-alt="Miche fitted set worn on body"><b>Hero photo</b><span>Full set on body</span></div>
+      <div class="hero-meta">
+        <span class="hero-dots" aria-hidden="true"><span class="dot" data-swatch="neon"></span><span class="dot" data-swatch="pink"></span></span>
+        <span>2 colors · XS–L</span>
+        <button class="hero-toggle" type="button" data-hero-toggle hidden aria-label="Pause background video">
+          <svg class="i-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+          <svg class="i-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+        </button>
+      </div>
     </div>
   </section>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee-track">
-      <span>Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i> Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i> Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i> Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i></span>
-      <span>Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i> Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i> Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i> Miche <i>/</i> Neon <i>/</i> Pink <i>/</i> Drop 001 <i>/</i></span>
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>Neon <i></i> Pink <i></i> 250–300 GSM <i></i> 95% cotton / 5% spandex <i></i> Rhinestone Miche script <i></i> Sizes XS–L <i></i> Drop 001 <i></i></span>
+      <span>Neon <i></i> Pink <i></i> 250–300 GSM <i></i> 95% cotton / 5% spandex <i></i> Rhinestone Miche script <i></i> Sizes XS–L <i></i> Drop 001 <i></i></span>
     </div>
   </div>
 
-  <section id="shop" class="wrap section">
-    <div class="section-head">
-      <h2 class="display h-section">Shop Drop 001</h2>
-      <p class="muted" style="margin: 0; font-size: 15px">Get the full set or pick up a piece.</p>
-    </div>
-    <div class="grid">
-      <a class="card" href="/product?piece=set&amp;color=neon">
-        <div class="ph r-45" data-role="setNeon" data-alt="The Fitted Set in neon"><b>Neon set photo</b><span>Zip-up + flare pants</span></div>
-        <div class="card-row"><strong>The Fitted Set</strong><span class="muted" data-price="set">$125</span></div>
-        <span class="card-color"><span class="dot" data-swatch="neon"></span>Neon</span>
-      </a>
-      <a class="card" href="/product?piece=set&amp;color=pink">
-        <div class="ph r-45" data-role="setPink" data-alt="The Fitted Set in pink"><b>Pink set photo</b><span>Zip-up + flare pants</span></div>
-        <div class="card-row"><strong>The Fitted Set</strong><span class="muted" data-price="set">$125</span></div>
-        <span class="card-color"><span class="dot" data-swatch="pink"></span>Pink</span>
-      </a>
-      <a class="card" href="/product?piece=hoodie" data-color-link="zipup">
-        <div class="ph r-45" data-role="zipup" data-alt="The Cropped Zip-Up"><b>Zip-up photo</b><span>Front, zipped</span></div>
-        <div class="card-row"><strong>The Cropped Zip-Up</strong><span class="muted" data-price="hoodie">$65</span></div>
-        <span class="card-color"><span class="dot" data-swatch="neon"></span><span class="dot" data-swatch="pink"></span>2 colors</span>
-      </a>
-      <a class="card" href="/product?piece=pants" data-color-link="pants">
-        <div class="ph r-45" data-role="pants" data-alt="The Flare Pants"><b>Pants photo</b><span>Full length</span></div>
-        <div class="card-row"><strong>The Flare Pants</strong><span class="muted" data-price="pants">$65</span></div>
-        <span class="card-color"><span class="dot" data-swatch="neon"></span><span class="dot" data-swatch="pink"></span>2 colors</span>
-      </a>
-    </div>
-  </section>
-
-  <section class="rule-top">
-    <div class="wrap section split">
+  <!-- COLORS: pick a color, the stage plays that color's photos -->
+  <section id="colors" class="wrap section colorway" data-colors>
+    <div class="section-top rv">
       <div>
-        <div class="ph r-54" data-role="macro" data-alt="Rhinestone Miche script up close"><b>Macro shot</b><span>Rhinestone script up close, in good light</span></div>
+        <p class="eyebrow">Two colors, one fit</p>
+        <h2 class="h2">Pick your color.</h2>
       </div>
-      <div class="stack">
-        <h2 class="display h-section">The details</h2>
-        <p class="lede" style="font-size: 17px">The Miche script is set in rhinestones on every piece, so the set reads on camera and in person.</p>
-        <dl class="specs">
-          <div><dt>Fabric</dt><dd>250–300 GSM, 95% cotton / 5% spandex</dd></div>
-          <div><dt>Logo</dt><dd>Rhinestone script</dd></div>
-          <div><dt>Fit</dt><dd>Fitted and true to size. Size up for more room.</dd></div>
-          <div><dt>Care</dt><dd>Inside out, cold wash, hang dry</dd></div>
-        </dl>
+      <div class="seg" role="group" aria-label="Color">
+        <button type="button" class="seg-btn" data-color-tab="neon" aria-pressed="true"><span class="dot" data-swatch="neon"></span>Neon</button>
+        <button type="button" class="seg-btn" data-color-tab="pink" aria-pressed="false"><span class="dot" data-swatch="pink"></span>Pink</button>
+      </div>
+    </div>
+    <div class="stage rv">
+      <div class="stage-media" data-stage-media aria-live="polite"></div>
+      <div class="stage-side">
+        <ol class="steps" data-stage-steps></ol>
+        <div class="stage-copy">
+          <p class="stage-name"><span class="dot" data-stage-dot></span><span data-stage-name>Neon</span></p>
+          <p class="muted">The full set, the cropped zip-up and the flare pants all come in this color.</p>
+          <a class="btn btn-accent" href="/product?piece=set&amp;color=neon" data-stage-shop>Shop the neon set</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <section id="signup" class="signup">
-    <div class="wrap section signup-inner">
+  <!-- SHOP: product cards; the dots swap the photo between colors -->
+  <section id="shop" class="wrap section">
+    <div class="section-top rv">
+      <div>
+        <p class="eyebrow">Drop 001</p>
+        <h2 class="h2">Get the set, or pick a piece.</h2>
+      </div>
+      <a class="link-arrow" href="/product?piece=set">See all details
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+    <div class="pcards">
+      <article class="pcard rv" data-pcard="set">
+        <a class="pcard-media" href="/product?piece=set&amp;color=neon" data-pcard-link><span class="pcard-num">01</span></a>
+        <div class="pcard-body">
+          <div class="pcard-row"><h3>The Fitted Set</h3><span data-price="set">$125</span></div>
+          <p class="muted">Zip-up + flare pants</p>
+          <div class="pcard-colors" role="group" aria-label="Color for The Fitted Set">
+            <button type="button" data-pcard-color="neon" aria-pressed="true"><span class="dot" data-swatch="neon"></span>Neon</button>
+            <button type="button" data-pcard-color="pink" aria-pressed="false"><span class="dot" data-swatch="pink"></span>Pink</button>
+          </div>
+        </div>
+      </article>
+      <article class="pcard rv" data-pcard="hoodie">
+        <a class="pcard-media" href="/product?piece=hoodie&amp;color=neon" data-pcard-link><span class="pcard-num">02</span></a>
+        <div class="pcard-body">
+          <div class="pcard-row"><h3>The Cropped Zip-Up</h3><span data-price="hoodie">$65</span></div>
+          <p class="muted">Cropped, full zip, fitted sleeves</p>
+          <div class="pcard-colors" role="group" aria-label="Color for The Cropped Zip-Up">
+            <button type="button" data-pcard-color="neon" aria-pressed="true"><span class="dot" data-swatch="neon"></span>Neon</button>
+            <button type="button" data-pcard-color="pink" aria-pressed="false"><span class="dot" data-swatch="pink"></span>Pink</button>
+          </div>
+        </div>
+      </article>
+      <article class="pcard rv" data-pcard="pants">
+        <a class="pcard-media" href="/product?piece=pants&amp;color=neon" data-pcard-link><span class="pcard-num">03</span></a>
+        <div class="pcard-body">
+          <div class="pcard-row"><h3>The Flare Pants</h3><span data-price="pants">$65</span></div>
+          <p class="muted">High-waisted, flares from the knee</p>
+          <div class="pcard-colors" role="group" aria-label="Color for The Flare Pants">
+            <button type="button" data-pcard-color="neon" aria-pressed="true"><span class="dot" data-swatch="neon"></span>Neon</button>
+            <button type="button" data-pcard-color="pink" aria-pressed="false"><span class="dot" data-swatch="pink"></span>Pink</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- FILM: custom video player -->
+  <section id="film" class="wrap section film-section" data-film-section hidden>
+    <div class="section-top rv">
+      <div>
+        <p class="eyebrow">The film</p>
+        <h2 class="h2">Drop 001, in motion.</h2>
+      </div>
+      <p class="muted film-credit">Photos by Wynning Shots</p>
+    </div>
+    <div class="player rv" data-player="inline">
+      <video class="player-video" playsinline muted preload="none" data-player-video></video>
+      <button class="player-big" type="button" data-player-big aria-label="Play the film">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+      </button>
+      <div class="player-bar">
+        <button class="player-btn" type="button" data-player-toggle aria-label="Play">
+          <svg class="i-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+          <svg class="i-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        </button>
+        <input class="player-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek" data-player-seek>
+        <span class="player-time" data-player-time>0:00</span>
+        <button class="player-btn" type="button" data-player-full aria-label="Full screen">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAILS: the photo stays put while the details scroll past -->
+  <section id="details" class="wrap section">
+    <div class="section-top rv">
+      <div>
+        <p class="eyebrow">The details</p>
+        <h2 class="h2">Made to fit like it was made for you.</h2>
+      </div>
+    </div>
+    <div class="story-scroll" data-scrolly>
+      <div class="scrolly-media" aria-hidden="true" data-scrolly-media></div>
+      <div class="scrolly-steps">
+        <article class="scrolly-step" data-scrolly-step="0">
+          <div class="scrolly-inline" data-scrolly-inline></div>
+          <span class="scrolly-num">01</span>
+          <h3>The script</h3>
+          <p>The Miche script is set in rhinestones on every piece, so the set catches light on camera and in person.</p>
+        </article>
+        <article class="scrolly-step" data-scrolly-step="1">
+          <div class="scrolly-inline" data-scrolly-inline></div>
+          <span class="scrolly-num">02</span>
+          <h3>The fabric</h3>
+          <p>95% cotton, 5% spandex at 250–300 GSM. Soft and stretchy, with enough weight that it never feels thin.</p>
+        </article>
+        <article class="scrolly-step" data-scrolly-step="2">
+          <div class="scrolly-inline" data-scrolly-inline></div>
+          <span class="scrolly-num">03</span>
+          <h3>The fit</h3>
+          <p>The zip-up is cropped and snatched at the waist. The pants are high-waisted, fitted through the hip and thigh, and flare from the knee.</p>
+        </article>
+        <article class="scrolly-step" data-scrolly-step="3">
+          <div class="scrolly-inline" data-scrolly-inline></div>
+          <span class="scrolly-num">04</span>
+          <h3>Sizing</h3>
+          <p>XS to L, true to size. Between sizes or want more room? Size up. <a href="/product?piece=set#size-guide">See the size guide</a>.</p>
+        </article>
+        <div class="offer-card rv">
+          <div class="offer-head">
+            <span class="offer-tag">Drop 001</span>
+            <span class="offer-price"><span data-price="set">$125</span><small>the set</small></span>
+          </div>
+          <h3>The Fitted Set</h3>
+          <ul class="checks">
+            <li>Cropped zip-up and flare pants</li>
+            <li>Rhinestone Miche script</li>
+            <li>Neon or pink, sizes XS–L</li>
+          </ul>
+          <a class="btn btn-accent btn-block" href="/product?piece=set">Shop the set</a>
+          <p class="offer-alt">Or get a piece: Zip-Up <span data-price="hoodie">$65</span> · Pants <span data-price="pants">$65</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY: words light up as you scroll -->
+  <section id="story" class="wrap section story">
+    <p class="eyebrow">Why Miche</p>
+    <p class="story-text" data-words>Miche means to lurk, to hide out of sight. I'm a D1 athlete who wanted somewhere to express more of my creativity, so I built it. Miche is a culture and a community for everyone with more to show.</p>
+    <p class="story-sign"><span class="sign-script">Rod Gibbs</span> Founder</p>
+  </section>
+
+  <!-- COMMUNITY: swipeable row of cards -->
+  <section class="section rail-section">
+    <div class="wrap section-top rv">
+      <div>
+        <p class="eyebrow">The culture</p>
+        <h2 class="h2">Lurk with us.</h2>
+      </div>
+      <div class="rail-arrows">
+        <button class="round-btn" type="button" data-rail-prev aria-label="Scroll back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <button class="round-btn" type="button" data-rail-next aria-label="Scroll forward">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="rail" data-rail tabindex="0" aria-label="Miche on social">
+      <button class="rcard rcard-video" type="button" data-play-film data-rail-photo="film" hidden>
+        <span class="rcard-play" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+        <span class="rcard-label"><strong>Watch the film</strong><span>Drop 001</span></span>
+      </button>
+      <a class="rcard" href="https://www.instagram.com/miche.inc" target="_blank" rel="noopener" data-rail-photo="neon:4">
+        <span class="rcard-label"><strong>@miche.inc</strong><span>Follow on Instagram</span></span>
+      </a>
+      <a class="rcard" href="/product?piece=set&amp;color=pink" data-rail-photo="pink:4">
+        <span class="rcard-label"><strong>Pink</strong><span>Shop the pink set</span></span>
+      </a>
+      <a class="rcard" href="https://www.tiktok.com/@miche.inc" target="_blank" rel="noopener" data-rail-photo="pink:6">
+        <span class="rcard-label"><strong>@miche.inc</strong><span>Watch on TikTok</span></span>
+      </a>
+      <a class="rcard" href="/product?piece=set&amp;color=neon" data-rail-photo="neon:6">
+        <span class="rcard-label"><strong>Neon</strong><span>Shop the neon set</span></span>
+      </a>
+      <button class="rcard rcard-offer" type="button" data-open-offer>
+        <span class="rcard-offer-top">Mystery discount</span>
+        <span class="rcard-offer-big">Scratch to reveal</span>
+        <span class="rcard-label"><strong>Get 10% off</strong><span>Tap to open</span></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="wrap section faq">
+    <div class="faq-head rv">
+      <p class="eyebrow">FAQ</p>
+      <h2 class="h2">Questions, answered.</h2>
+      <p class="muted">Still need help? Email <a href="mailto:miche7488@gmail.com">miche7488@gmail.com</a>.</p>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>How does it fit?</summary>
+        <p>Fitted and true to size. The zip-up is cropped and snatched at the waist; the pants are high-waisted, fitted through the hip and thigh, and flare from the knee. Between sizes or want more room? Size up.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What sizes are there?</summary>
+        <p>XS to L. Measurements for every size are in the <a href="/product?piece=set#size-guide">size guide</a>.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What's it made of?</summary>
+        <p>95% cotton and 5% spandex, 250–300 GSM. Soft, stretchy and thick enough that it doesn't feel thin.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I wash it?</summary>
+        <p>Turn it inside out, wash cold and hang dry. Don't iron over the rhinestone script.</p>
+      </details>
+      <details class="faq-item">
+        <summary>When will my order ship?</summary>
+        <p>Orders ship in [X] business days, and shipping is free on orders over [$X].</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I return it?</summary>
+        <p>Unworn pieces with tags on can be returned within [RETURN WINDOW] days.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I get 10% off?</summary>
+        <p>Scratch the mystery card, then sign up with your email and number. Your code shows up right away. <button class="text-btn" type="button" data-open-offer>Open it now</button></p>
+      </details>
+    </div>
+  </section>
+
+  <!-- SIGNUP -->
+  <section id="signup" class="wrap section">
+    <div class="signup-card rv">
       <div class="signup-copy">
-        <h2 class="display">Get the drop first</h2>
-        <p style="margin: 0; max-width: 460px; font-size: 17px; font-weight: 500">Early access link and restock alerts, straight to your inbox.</p>
+        <h2 class="h2">Get the drop first.</h2>
+        <p>Early access and restock alerts, straight to your inbox.</p>
       </div>
       <form class="signup-form" data-signup novalidate>
         <label for="email">Email</label>
@@ -126,11 +359,24 @@
     </div>
   </section>
 
-  <section id="about" class="wrap section about">
-    <h2 class="display h-section">Why Miche</h2>
-    <div class="about-body">
-      <p class="quote">Miche means to lurk, to hide out of sight. I'm a D1 athlete who wanted somewhere to express more of my creativity, so I built it. Miche is a culture and a community for everyone with more to show.</p>
-      <p class="muted" style="margin: 0; font-size: 15px">— Rod Gibbs, founder</p>
+  <!-- CLOSER: the film again, full width -->
+  <section class="closer" aria-label="Shop Drop 001">
+    <div class="closer-card">
+      <div class="hero-fallback"><div class="ph" data-role="setPink" data-alt="The Fitted Set in pink"><b>Photo</b></div></div>
+      <video class="closer-video" muted loop playsinline preload="none" aria-hidden="true" data-closer-video></video>
+      <div class="hero-shade" aria-hidden="true"></div>
+      <div class="closer-content">
+        <h2 class="closer-title">More to show.</h2>
+        <div class="btn-row">
+          <a class="btn btn-accent" href="/product?piece=set&amp;color=neon">Shop neon</a>
+          <a class="btn btn-glass" href="/product?piece=set&amp;color=pink">Shop pink</a>
+        </div>
+        <ul class="closer-facts">
+          <li>Sizes XS–L</li>
+          <li>Free shipping over [$X]</li>
+          <li>[RETURN WINDOW]-day returns</li>
+        </ul>
+      </div>
     </div>
   </section>
 
@@ -139,13 +385,17 @@
 <footer class="site-footer">
   <div class="wrap">
     <div class="footer-top">
-      <a class="wordmark" href="/">Miche</a>
       <div class="footer-cols">
         <div>
+          <p>Shop</p>
+          <a href="/product?piece=set">The Fitted Set</a>
+          <a href="/product?piece=hoodie">The Cropped Zip-Up</a>
+          <a href="/product?piece=pants">The Flare Pants</a>
+        </div>
+        <div>
           <p>Help</p>
-          <a href="#">Shipping</a>
-          <a href="#">Returns</a>
           <a href="/product?piece=set#size-guide">Size guide</a>
+          <a href="#faq">FAQ</a>
           <a href="mailto:miche7488@gmail.com">Contact</a>
           <a href="/terms">Terms</a>
           <a href="/privacy">Privacy</a>
@@ -157,14 +407,40 @@
         </div>
       </div>
     </div>
+    <a class="footer-mark" href="/" aria-label="Miche home">Miche</a>
     <p class="copyright">© <span data-year>2026</span> Miche. All rights reserved.</p>
   </div>
 </footer>
+
+<!-- Full-screen film player -->
+<div class="film-modal" hidden data-film-modal role="dialog" aria-modal="true" aria-label="The film">
+  <button class="film-close round-btn" type="button" data-film-close aria-label="Close the film">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12"/><path d="M18 6L6 18"/></svg>
+  </button>
+  <div class="player player-modal" data-player="modal">
+    <video class="player-video" playsinline muted preload="none" data-player-video></video>
+    <button class="player-big" type="button" data-player-big aria-label="Play the film">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+    </button>
+    <div class="player-bar">
+      <button class="player-btn" type="button" data-player-toggle aria-label="Play">
+        <svg class="i-play" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>
+        <svg class="i-pause" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+      </button>
+      <input class="player-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek" data-player-seek>
+      <span class="player-time" data-player-time>0:00</span>
+      <button class="player-btn" type="button" data-player-full aria-label="Full screen">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script src="/config.js"></script>
 <script src="/photos.js"></script>
 <script src="/signup.js"></script>
 <script src="/app.js"></script>
+<script src="/home.js"></script>
 <script src="/popup.js"></script>
 </body>
 </html>

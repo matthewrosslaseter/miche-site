@@ -13,10 +13,12 @@ import { Readable } from 'node:stream';
 import path from 'node:path';
 import sharp from 'sharp';
 import yauzl from 'yauzl';
+import { createHash } from 'node:crypto';
+import { makeFilm } from './film.mjs';
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, 'dist');
-const SITE_FILES = ['index.html', 'product.html', 'photos.html', 'privacy.html', 'terms.html', 'styles.css', 'config.js', 'signup.js', 'app.js', 'popup.js', 'favicon.svg'];
+const SITE_FILES = ['index.html', 'product.html', 'photos.html', 'privacy.html', 'terms.html', 'styles.css', 'config.js', 'signup.js', 'app.js', 'home.js', 'popup.js', 'favicon.svg'];
 // Kept between builds by Vercel's build cache, so the folder is only downloaded again when the link or VERSION changes
 const CACHE = path.join(ROOT, 'node_modules', '.cache', 'miche-photos');
 const VERSION = '1';
@@ -201,16 +203,84 @@ async function tagColors(photos) {
   return swatches;
 }
 
+/*
+  The film: picks up to 8 neon and 8 pink photos (the ones chosen in config.js first, then others
+  spread across the shoot), alternates them, and renders two MP4 loops. Cached between builds.
+*/
+const FILM_VERSION = '1';
+async function buildFilm(photos) {
+  const win = {};
+  new Function('window', await readFile(path.join(ROOT, 'config.js'), 'utf8'))(win);
+  const C = win.MICHE_CONFIG || {};
+  const fix = C.colorOverrides || {};
+  const colorOf = (p) => (fix[p.name] !== undefined ? fix[p.name] : p.color);
+  const pick = (color) => {
+    const all = photos.filter((p) => colorOf(p) === color).map((p) => p.name);
+    const first = [];
+    const want = [C.shoot && color === 'neon' ? C.shoot.hero : '', ...(((C.colorPhotos || {})[color]) || [])];
+    for (const n of want) if (n && all.includes(n) && !first.includes(n)) first.push(n);
+    const rest = all.filter((n) => !first.includes(n));
+    const need = Math.max(0, 8 - first.length);
+    for (let i = 0; i < need && rest.length; i++) {
+      const n = rest[Math.round(i * (rest.length - 1) / Math.max(1, need - 1))];
+      if (!first.includes(n)) first.push(n);
+    }
+    return first.slice(0, 8);
+  };
+  const neon = pick('neon'), pink = pick('pink');
+  const shots = [];
+  for (let i = 0; i < Math.max(neon.length, pink.length); i++) {
+    if (neon[i]) shots.push(neon[i]);
+    if (pink[i]) shots.push(pink[i]);
+  }
+  if (shots.length < 3) throw new Error('not enough photos for the film');
+
+  const key = createHash('sha1').update(FILM_VERSION + '|' + shots.join(',')).digest('hex').slice(0, 12);
+  const dir = path.join(CACHE, 'film', key);
+  const meta = path.join(dir, 'film.json');
+  let info = null;
+  try { info = JSON.parse(await readFile(meta, 'utf8')); } catch { info = null; }
+  if (!info) {
+    console.log(`Making the film from ${shots.length} photos…`);
+    await rm(path.join(CACHE, 'film'), { recursive: true, force: true });
+    await mkdir(dir, { recursive: true });
+    const t0 = Date.now();
+    info = await makeFilm(shots.map((n) => path.join(CACHE, 'full', n + '.jpg')), dir);
+    info.shots = shots;
+    await writeFile(meta, JSON.stringify(info));
+    console.log(`  film done in ${Math.round((Date.now() - t0) / 1000)}s:`, JSON.stringify(info));
+  } else {
+    console.log('Using the cached film');
+  }
+  await mkdir(path.join(OUT, 'media'), { recursive: true });
+  for (const f of ['film-tall.mp4', 'film-wide.mp4', 'film-tall.jpg', 'film-wide.jpg']) {
+    await cp(path.join(dir, f), path.join(OUT, 'media', f));
+  }
+  return {
+    tall: '/media/film-tall.mp4', wide: '/media/film-wide.mp4',
+    posterTall: '/media/film-tall.jpg', posterWide: '/media/film-wide.jpg',
+    tallSeconds: info.tallSeconds, wideSeconds: info.wideSeconds, version: key
+  };
+}
+
 await copySite();
 let photos = [];
 let swatches = {};
+let film = null;
 try {
   photos = await pullPhotos();
   swatches = await tagColors(photos);
 } catch (e) {
   console.warn(`Photos skipped: ${e.message}`);
 }
-const photoData = { photos, swatches };
+if (photos.length) {
+  try {
+    film = await buildFilm(photos);
+  } catch (e) {
+    console.warn(`Film skipped: ${e.message}`);
+  }
+}
+const photoData = { photos, swatches, film };
 await writeFile(path.join(OUT, 'photos.json'), JSON.stringify(photoData));
 // Same data as a script, so pages can use it right away without waiting on a fetch
 await writeFile(path.join(OUT, 'photos.js'), 'window.MICHE_PHOTOS = ' + JSON.stringify(photoData) + ';\n');
